@@ -1,0 +1,12 @@
+This code runs over H->gamgam Monte Carlo and produces
+histograms in the file histos8.root.
+
+To run the code:
+make
+./runSpin
+
+
+Options:
+There are no arguments. In the file mainSpin.cc you can 
+change whether to run over the 8TeV or 14TeV MC and whether
+to run over all files or just one.
