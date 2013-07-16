@@ -1,1 +1,1 @@
-This is just to make sure that I get how git works.
+This is just to make sure that I get how git works. Migration complete! (kinda)
