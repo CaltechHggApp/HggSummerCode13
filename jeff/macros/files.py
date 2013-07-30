@@ -2,7 +2,7 @@
 # chain->add("<path to file 1>");
 # chain->add("<path to file 2>");
 #
-# I usually copy and paste it into an analysis script
+# I copy and paste it into an analysis script
 # To run: python files.py
 
 import os

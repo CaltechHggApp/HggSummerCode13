@@ -1,5 +1,5 @@
 This code runs over H->gamgam Monte Carlo and produces
-histograms in the file histos8.root.
+histograms in the file histos14.root.
 
 To run the code:
 make

@@ -1,11 +1,19 @@
-// C++ includes                                                                              
+// Main file for spin analysis. See the README.
+// To change between 8TeV and 14TeV change this:
+#define ENERGY 8;  // 8 or 14
+// Make this 0 to test the code with 1 file, or 1 to run over all data
+#define ALL 0;  // true/false
+
+
+// C++ includes
 #include <iostream>
 #include <stdio.h>
 #include <algorithm>
 #include <math.h>
 #include <fstream>
 
-// ROOT includes                                                                             
+// ROOT includes
+
 //#include <TROOT.h>
 #include <TFile.h>
 #include <TString.h>
@@ -25,8 +33,8 @@ using namespace std;
 
 int main()
 {
-   int dataset = 8; // 8 or 14 TeV samples
-   int all = 0; // True:run over all data. False: just 1 file 
+   int dataset = ENERGY;
+   int all = ALL;
    TString filename = (dataset == 8) ? "histos8.root" : "histos14.root";
    TTree *tree = makeTree(dataset, all);
    HggSpin* t = new HggSpin(tree);
