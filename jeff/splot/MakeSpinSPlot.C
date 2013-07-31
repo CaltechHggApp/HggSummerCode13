@@ -16,6 +16,12 @@ void MakeSpinSPlot::addSpecies(TString name, RooAbsPdf* pdf, double expYield){
   //these need to be kept in sync
 }
 
+void MakeSpinSPlot::createObservables(){
+   for(std::vector<RooRealVar*>::iterator varIt = __variables.begin();
+       varIt!=__variables.end(); varIt++){
+      __observables.add(*(*varIt));
+   }
+}
 
 void MakeSpinSPlot::computeCovMatrix(){
 
@@ -37,8 +43,7 @@ void MakeSpinSPlot::computeCovMatrix(){
     for(int iRow = 0; iRow<__nSpec;iRow++){
       for(int iCol = 0; iCol<__nSpec;iCol++){
 	double den = TMath::Power(computeDenom(),2);
-	RooArgSet observable(*__variables[0]);
-	double num = __pdfs.at(iRow)->getVal(observable) * __pdfs.at(iCol)->getVal(observable);
+	double num = __pdfs.at(iRow)->getVal(__observables) * __pdfs.at(iCol)->getVal(__observables);
 	(*__covMatrix)[iRow][iCol] += num/den;
       }
     }
@@ -59,7 +64,7 @@ double MakeSpinSPlot::computeDenom(){ //compute the denominator for the covarian
 
   double denom=0;
   for(; pdfIt != __pdfs.end(); pdfIt++, expIt++){
-     denom+= (*expIt) * ((*pdfIt)->getVal(RooArgSet(*__variables[0])));
+     denom+= (*expIt) * ((*pdfIt)->getVal(__observables));
   }
   return denom;
 }
@@ -94,9 +99,8 @@ void MakeSpinSPlot::computeSWeight(){
       for(; pdfIt != __pdfs.end(); pdfIt++){
 	int iCol = pdfIt - __pdfs.begin();
 	
-	num += (*__covMatrix)[iRow][iCol] * ((*pdfIt)->getVal(RooArgSet(*__variables[0])));
+	num += (*__covMatrix)[iRow][iCol] * ((*pdfIt)->getVal(__observables));
       }
-//      num = (__expectedYields[iRow]) * (__pdfs[iRow]->getVal(RooArgSet(*__variables[0])));
       double denom = computeDenom();
       ((RooRealVar*)__sWeightVars->find( Form( "%s_sw", specIt->Data()) ))->setVal(num/denom);
     }//end loop over species
@@ -108,6 +112,7 @@ void MakeSpinSPlot::computeSWeight(){
 
 void MakeSpinSPlot::calculate(){
   if(__nSpec<0) return;
+  createObservables();
   computeCovMatrix();
   computeSWeight();
 }

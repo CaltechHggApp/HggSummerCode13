@@ -20,6 +20,7 @@
 #include "RooCBShape.h"
 #include "RooSimultaneous.h"
 #include "RooExtendPdf.h"
+#include "RooRandom.h"
 
 #include "TMatrixT.h"
 #include "TMath.h"
@@ -182,6 +183,7 @@ void plot(RooWorkspace* ws)
 
 int main()
 {
+   (RooRandom::randomGenerator())->SetSeed(0); 
    RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
    makeToyData();
    return 1;
