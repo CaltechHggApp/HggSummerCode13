@@ -27,6 +27,7 @@
 #include "TH1F.h"
 #include "TStyle.h"
 #include "TError.h"
+#include <numeric>
 
 #include "MakeSpinSPlot.C"
 
@@ -34,9 +35,9 @@ using namespace std;
 using namespace RooFit;
 
 void plot(RooWorkspace*);
-void weightData(RooWorkspace*);
+RooWorkspace* weightData(RooWorkspace*,vector<double>*);
 
-void makeToyData()
+RooWorkspace* makeToyData()
 {
    RooRealVar mass("mass","mass",110,150);
    RooRealVar cosT("cosT","cosT",0.,1.);
@@ -62,8 +63,8 @@ void makeToyData()
    RooPolynomial cosT_bkg_model("cosT_bkg_model","",cosT,RooArgList(b0,b1));
 
 //combined model
-   RooRealVar sigYield("sigYield","sigYield",1000,0.,10000);
-   RooRealVar bkgYield("bkgYield","bkgYield",10000,0,1000000);
+   RooRealVar sigYield("sigYield","sigYield",100,0.,10000);
+   RooRealVar bkgYield("bkgYield","bkgYield",100,0,10000000);
 
 
    RooArgSet set;
@@ -96,11 +97,10 @@ void makeToyData()
    ws->import(sigYield);
    ws->import(bkgYield);
 
-   weightData(ws);
-
+   return ws;
 }
 
-void weightData(RooWorkspace* ws)
+RooWorkspace* weightData(RooWorkspace* ws, vector<double>* yield)
 {
    RooRealVar *mass = ws->var("mass");
    RooRealVar *cosT = ws->var("cosT");
@@ -129,6 +129,7 @@ void weightData(RooWorkspace* ws)
    model.fitTo(*data,Extended(),PrintLevel(-1));
    cout<<"sigYield "<<sigYield->getVal()<<endl;
    cout<<"bkgYield "<<bkgYield->getVal()<<endl;
+   yield->push_back(sigYield->getVal());
 
    MakeSpinSPlot splotter(data);
    splotter.addSpecies("signal",sigModel,sigYield->getVal());
@@ -154,15 +155,13 @@ void weightData(RooWorkspace* ws)
 
       mass->setVal(data->get(i)->getRealValue("mass"));
       cosT->setVal(data->get(i)->getRealValue("cosT"));
-      if(mass->getVal()<130 && mass->getVal() > 120){
-//	  cout<<" "<<sweights->get(i)->getRealValue("signal_sw")<<" "<<sweights->get(i)->getRealValue("background_sw")<<" "<<sweights->get(i)->getRealValue("signal_sw")+sweights->get(i)->getRealValue("background_sw")<<endl;
       }
-      sig->add(set,weight_double);
+      sig ->add(set,weight_double);
    }
 
    ws->import(*sig);
-   ws->Print();
-   plot(ws);
+//   ws->Print();
+   return ws;
 }
 
 
@@ -172,8 +171,8 @@ void plot(RooWorkspace* ws)
    RooRealVar *cosT = ws->var("cosT");
    RooDataSet *data = (RooDataSet*)ws->data("sig");
 
-   RooPlot* frame = cosT->frame(Bins(40));
-   data->reduce("cosT")->plotOn(frame);
+   RooPlot* frame = mass->frame(Bins(40));
+   data->reduce("mass")->plotOn(frame);
    data->statOn(frame,Layout(0.55,0.99,0.8));
    TCanvas c1;
    frame->Draw();
@@ -185,6 +184,29 @@ int main()
 {
    (RooRandom::randomGenerator())->SetSeed(0); 
    RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
-   makeToyData();
+
+   int nToys = 1;
+   vector<double>* yields = new vector<double>;
+   for(int i=0;i<nToys;i++)
+   {
+      cout<<"Running toy "<<i<<":"<<endl;
+      RooWorkspace *ws =makeToyData();
+      ws = weightData(ws, yields);
+
+
+      if(i==0) plot(ws);
+      cout<<"\n"<<endl;
+   }
+
+   double sum = accumulate(yields->begin(),yields->end(),0.);
+   double mean = sum / nToys;
+
+//   for(vector<double>::iterator it = yields->begin(); it != yields->end(); it++){
+//     sum+= (*it);
+//   }
+   double sq_sum = inner_product(yields->begin(),yields->end(),yields->begin(),0.);
+   double stdev = sqrt(sq_sum/nToys - mean*mean);
+   cout<<"average sig yield: "<< mean <<endl;
+   cout<<"stdev:               "<<stdev<<endl;
    return 1;
 }
