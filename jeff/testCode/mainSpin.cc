@@ -33,6 +33,9 @@ using namespace RooFit;
 
 int main()
 {
+   (RooRandom::randomGenerator())->SetSeed(0);
+   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
+
 //   int dataset = ENERGY;
 //   int all = ALL;
 //   TString filename = (dataset == 8) ? "histos8.root" : "histos14.root";
@@ -40,8 +43,11 @@ int main()
 //   HggSpin* t = new HggSpin(tree);
 //   t->Loop(filename);
 
+
+
    Class2* obj = new Class2();
    obj->fitMC();
-//   obj->generate();
-//   obj->plot();
+   obj->generate();
+   obj->extract();
+   obj->plot();
 }

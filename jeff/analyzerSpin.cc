@@ -27,10 +27,10 @@ void HggSpin::Loop(TString filename)
 {
    TFile *outputFile = new TFile(filename, "recreate");
    TTree *tree = new TTree("tree","");
-   Float_t dipho_mass;
-   Float_t max_eta;
-   TBranch *mass = tree->Branch("mass",&dipho_mass,"dipho_mass/F");
-   TBranch *maxEta = tree->Branch("maxEta",&max_eta,"max_eta/F");
+   Float_t mass;
+   Float_t maxEta;
+   tree->Branch("mass",&mass,"mass/F");
+   tree->Branch("maxEta",&maxEta,"maxEta/F");
 
    Long_t nEvents = chain->GetEntries();
    cout<<"number of MC events is "<<nEvents<<endl;
@@ -74,8 +74,8 @@ void HggSpin::Loop(TString filename)
       gamma2.SetPtEtaPhiM(top_pt[1], top_eta[1], top_phi[1], 0);
       higgs = gamma1 + gamma2;
 
-      dipho_mass = higgs.M();
-      max_eta = max(fabs(gamma1.Eta()), fabs(gamma2.Eta()));
+      mass = higgs.M();
+      maxEta = max(fabs(gamma1.Eta()), fabs(gamma2.Eta()));
 
       tree->Fill();
    } // end loop over events
