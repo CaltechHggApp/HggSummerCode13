@@ -1,8 +1,0 @@
-Still under construction..
-
-To run:
-make
-./run
-
-Produces plot.pdf.
-You edit the code in splot.cc to say what you want on plot.pdf but it's confusing.

@@ -18,8 +18,8 @@
 #include <TRandom3.h>
 #include <TF1.h>
 
-#include "analyzerSpin.h"
-#include "librarySpin.h"
+#include "../include/analyzerSpin.h"
+#include "librarySpin.cc"
 
 using namespace std;
 

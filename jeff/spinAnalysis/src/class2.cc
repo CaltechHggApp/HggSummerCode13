@@ -1,4 +1,4 @@
-#include "class2.h"
+#include "../include/class2.h"
 
 void Class2::fitMC()
 {
