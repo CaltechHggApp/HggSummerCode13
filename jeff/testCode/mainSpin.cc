@@ -26,7 +26,7 @@
 #include <TF1.h>
 
 //#include "analyzerSpin.cc"
-#include "class2.h"
+#include "class2.cc"
 
 using namespace std;
 using namespace RooFit;
@@ -46,6 +46,7 @@ int main()
 
 
    Class2* obj = new Class2();
+   obj->setEtaRanges();
    obj->fitMC();
    obj->generate();
    obj->extract();
