@@ -32,11 +32,11 @@ float smear(float energy, float eta)
    TRandom3 random(0);
    if(fabs(eta) < 1.4)
    {
-      return energy * (1 + random.Gaus(0,.024));
+      return energy * (1 + random.Gaus(0,.01));
    }
    if(fabs(eta) > 1.4)
    {
-      return energy * (1 + random.Gaus(0,.039));
+      return energy * (1 + random.Gaus(0,.04));
    }
 }
 

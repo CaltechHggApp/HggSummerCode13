@@ -2,7 +2,7 @@
 
 void Class2::fitMC()
 {
-   TFile *f = new TFile("histos8.root");
+   TFile *f = new TFile("./lib/histos8.root");
    TTree *tree = (TTree*)f->Get("tree");
    RooDataSet *MC = new RooDataSet("MC","",RooArgSet(*mass,*maxEta),Import(*tree));
    int nEntries=MC->numEntries();
@@ -49,7 +49,7 @@ void Class2::generate()
       create_n = (int)round(nsignal * signalEfficiency[it-etaRange.begin()]);
       genData_sig_mass = model_sig_mass->generate(*mass,create_n);
       genData_sig_cosT = model_sig_cosT->generate(*cosT,create_n);
-
+      cout<<create_n<<endl;
       for(int i=0; i<create_n; i++)
       {
 	 mass->setVal(genData_sig_mass->get(i)->getRealValue("mass"));
@@ -72,8 +72,8 @@ void Class2::generate()
 
 void Class2::extract()
 {
-   RooRealVar *sigYield = new RooRealVar("sigYield","",0,10000);
-   RooRealVar *bkgYield = new RooRealVar("bkgYield","",0,100000);
+   RooRealVar *sigYield = new RooRealVar("sigYield","",0,5 * nsignal);
+   RooRealVar *bkgYield = new RooRealVar("bkgYield","",0,5 * nbackground);
    RooAddPdf *model_mass = new RooAddPdf("model_mass","",RooArgList(*model_sig_mass,*model_bkg_mass),RooArgList(*sigYield,*bkgYield));
    model_mass->fitTo(*toyData,PrintLevel(-1));
 
@@ -94,15 +94,14 @@ void Class2::extract()
    set.add(*cosT);
    set.add(*weight);
 
-   extractedData = new RooDataSet("sig","",set,"weight");
+   extractedData = new RooDataSet("extractedData","",set,"weight");
 
    Long64_t nEntries = toyData->numEntries();
    for(int i=0;i<nEntries;i++)
    {
       double weight_double=0;
       weight_double += sweights->get(i)->getRealValue("signal_sw");
-      weight_double += sweights->get(i)->getRealValue("background_sw");                     
-
+//      weight_double += sweights->get(i)->getRealValue("background_sw");                     
       mass->setVal(toyData->get(i)->getRealValue("mass"));
       cosT->setVal(toyData->get(i)->getRealValue("cosT"));
       extractedData->add(set,weight_double);
@@ -113,9 +112,9 @@ void Class2::extract()
 
 void Class2::plot()
 {
-   RooPlot* frame = mass->frame(Bins(40));
-   toyData->reduce("mass")->plotOn(frame);
-   toyData->statOn(frame,Layout(0.55,0.99,0.8));
+   RooPlot* frame = cosT->frame(Bins(40));
+   extractedData->reduce("cosT")->plotOn(frame);
+   extractedData->statOn(frame,Layout(0.55,0.99,0.8));
    TCanvas c1;
    frame->Draw();
    c1.SaveAs("plot.pdf");

@@ -1,10 +1,3 @@
-// Main file for spin analysis. See the README.
-// To change between 8TeV and 14TeV change this:
-#define ENERGY 8;  // 8 or 14
-// Make this 0 to test the code with 1 file, or 1 to run over all data
-#define ALL 0;  // true/false
-
-
 // C++ includes
 #include <iostream>
 #include <stdio.h>
@@ -25,8 +18,9 @@
 #include <TRandom3.h>
 #include <TF1.h>
 
-//#include "analyzerSpin.cc"
+#include "analyzerSpin.cc"
 #include "class2.cc"
+#include "../include/ReadConfig.hh"
 
 using namespace std;
 using namespace RooFit;
@@ -36,13 +30,25 @@ int main()
    (RooRandom::randomGenerator())->SetSeed(0);
    RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
-//   int dataset = ENERGY;
-//   int all = ALL;
-//   TString filename = (dataset == 8) ? "histos8.root" : "histos14.root";
-//   TTree *tree = makeTree(dataset, all);
-//   HggSpin* t = new HggSpin(tree);
-//   t->Loop(filename);
 
+   ReadConfig cfgReader("config.cfg");
+   int runMC = atoi(cfgReader.getParameter("runMC").c_str());
+   int allMC = atoi(cfgReader.getParameter("allMC").c_str());
+   int EB_res = atoi(cfgReader.getParameter("EB_res").c_str());
+   int EE_res = atoi(cfgReader.getParameter("EE_res").c_str());
+   int lumi = atoi(cfgReader.getParameter("lumi").c_str());
+   int energy = atoi(cfgReader.getParameter("energy").c_str());
+   int n_bkg = atoi(cfgReader.getParameter("n_bkg").c_str());
+
+
+
+   if(runMC)
+   {
+      TString filename = (energy == 8) ? "histos8.root" : "histos14.root";
+      TTree *tree = makeTree(energy, allMC); 
+      HggSpin* t = new HggSpin(tree);
+      t->Loop(filename);
+   }
 
 
    Class2* obj = new Class2();
@@ -51,4 +57,5 @@ int main()
    obj->generate();
    obj->extract();
    obj->plot();
+
 }

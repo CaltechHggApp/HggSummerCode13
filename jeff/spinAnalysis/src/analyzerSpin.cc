@@ -25,7 +25,7 @@ using namespace std;
 
 void HggSpin::Loop(TString filename)
 {
-   TFile *outputFile = new TFile(filename, "recreate");
+   TFile *outputFile = new TFile("./lib/"+filename, "recreate");
    TTree *tree = new TTree("tree","");
    Float_t mass;
    Float_t maxEta;

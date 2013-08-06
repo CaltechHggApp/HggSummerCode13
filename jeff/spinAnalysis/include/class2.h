@@ -85,14 +85,14 @@ Class2::Class2()
    model_sig_mass = new RooGaussian("model_sig_mass","",*mass,*mean_sig_mass,*sigma_sig_mass);
 
    cosT = new RooRealVar("cosT","",0.,1.);
-   p1_sig_cosT = new RooRealVar("p1",0,-2,2);
+   p1_sig_cosT = new RooRealVar("p1_sig_cosT",0,-2,2);
    model_sig_cosT = new RooPolynomial ("model_sig_cosT","",*cosT,RooArgList(*p1_sig_cosT));
    
    c_bkg_mass = new RooRealVar("c_bkg_mass","",-.05,-5,5);
    model_bkg_mass = new RooExponential("model_bkg_mass","",*mass,*c_bkg_mass);
 
-   p1_bkg_cosT = new RooRealVar("p1_bkg_cosT","",-2,-5,5);
-   p2_bkg_cosT = new RooRealVar("p2_bkg_cosT","",2,-1,2);
+   p1_bkg_cosT = new RooRealVar("p1_bkg_cosT","",0,-100,100);
+   p2_bkg_cosT = new RooRealVar("p2_bkg_cosT","",1,-100,100);
    model_bkg_cosT = new RooPolynomial("model_bkg_cosT","",*cosT,RooArgList(*p1_bkg_cosT,*p2_bkg_cosT));
 
    maxEta = new RooRealVar("maxEta","",0.,50.);
@@ -140,12 +140,12 @@ void Class2::setEtaRanges()
 
    pair <float,float> range6;
    range6.first=3.0;
-   range6.second=4.0;
+   range6.second=15.0;
 
    etaRange.push_back(range1);
    etaRange.push_back(range2);
    etaRange.push_back(range3);
    etaRange.push_back(range4);
-//   etaRange.push_back(range5);
-//   etaRange.push_back(range6);
+   etaRange.push_back(range5);
+   etaRange.push_back(range6);
 }
