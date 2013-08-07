@@ -1,5 +1,5 @@
 #include "../include/class2.h"
-#include "MakeSpinSplot.C"
+#include "MakeSpinSPlot.C"
 
 
 void Class2::calculateNSignal(float lumi, float nbkg)
