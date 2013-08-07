@@ -1,6 +1,5 @@
 #include "MakeSpinFits.h"
 #include "subtract.cc"
-
 #include "RooTrace.h"
 #define NUM_CPU 1
 
@@ -861,7 +860,7 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
   //### MakeBackground Function ###//
   RooDataSet Background_Combined("Background_Combined");
   for(std::vector<TString>::iterator lblit = lblvec.begin(); lblit != lblvec.end(); ++lblit){
-    Background_Combined.append(*lblit + "_Combined")
+    Background_Combined.append(*lblit + "_Combined");
       }
 
   TString dataTag="Data";
