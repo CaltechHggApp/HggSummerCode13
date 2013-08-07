@@ -864,9 +864,8 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
     Background_Combined.append(*lblit + "_Combined")
       }
 
-  //### Set to TRUE ###//
   TString dataTag="Data";
-  if(fitMCbackground == true) dataTag="Background";
+  if(fitMCbackground) dataTag="Background";
 
   RooAbsData *ds = ws->data(dataTag+"_Combined")->reduce(TString("evtcat==evtcat::")+catTag);
 
