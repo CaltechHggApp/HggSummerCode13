@@ -857,9 +857,16 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
   if(ws==0) return;
   RooRealVar mass = *(ws->var("mass"));
   cout << "1" <<endl;
+  
+  //### MakeBackground Function ###//
+  RooDataSet Background_Combined("Background_Combined");
+  for(std::vector<TString>::iterator lblit = lblvec.begin(); lblit != lblvec.end(); ++lblit){
+    Background_Combined.append(*lblit + "_Combined")
+      }
 
+  //### Set to TRUE ###//
   TString dataTag="Data";
-  if(fitMCbackground) dataTag="Background";
+  if(fitMCbackground == true) dataTag="Background";
 
   RooAbsData *ds = ws->data(dataTag+"_Combined")->reduce(TString("evtcat==evtcat::")+catTag);
 
@@ -872,7 +879,7 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
 
   //background model
   RooAbsPdf* BkgShape;
- 
+  
   switch(fitType){
   case kExp:
     {
