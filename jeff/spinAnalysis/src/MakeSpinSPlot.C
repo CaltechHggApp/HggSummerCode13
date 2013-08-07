@@ -1,5 +1,7 @@
-#include "MakeSpinSPlot.h"
+#include "../include/MakeSpinSPlot.h"
 #include <iostream>
+
+using namespace std;
 
 MakeSpinSPlot::MakeSpinSPlot(RooAbsData *data){
   __dataSet = data;
@@ -38,23 +40,37 @@ void MakeSpinSPlot::computeCovMatrix(){
 	varIt!=__variables.end(); varIt++){
       (*varIt)->setVal( ((RooRealVar*)set->find((*varIt)->GetName()))->getVal() );
     }
-
+//    cout<<"mass is "<<__variables[0]->getVal()<<"  "<<__pdfs.at(0)->getVal(RooArgSet(*__variables[0]))<<"  "<<__pdfs.at(1)->getVal(RooArgSet(*__variables[0]))<<endl; 
     //compute the matrix
     for(int iRow = 0; iRow<__nSpec;iRow++){
       for(int iCol = 0; iCol<__nSpec;iCol++){
 	double den = TMath::Power(computeDenom(),2);
 	double num = __pdfs.at(iRow)->getVal(__observables) * __pdfs.at(iCol)->getVal(__observables);
+//	cout<<"mass is "<<__variables[0]->getVal()<<"  "<<num<<endl;
+//	cout<<num/den<<endl;
 	(*__covMatrix)[iRow][iCol] += num/den;
       }
     }
   }//while
+
+//  __covMatrix->Invert();
+
     for(int iRow = 0; iRow<__nSpec;iRow++){
       for(int iCol = 0; iCol<__nSpec;iCol++){
 	std::cout << (*__covMatrix)[iRow][iCol] << " ";
       }
       std::cout << std::endl;
     }
-  __covMatrix->Invert();
+    __covMatrix->Invert();
+
+    cout<<"\n after inverting"<<endl;
+    for(int iRow = 0; iRow<__nSpec;iRow++){
+       for(int iCol = 0; iCol<__nSpec;iCol++){
+	  std::cout << (*__covMatrix)[iRow][iCol] << " ";
+       }
+       std::cout << std::endl;
+    }
+
 }
 
 double MakeSpinSPlot::computeDenom(){ //compute the denominator for the covariance matrix
@@ -91,21 +107,25 @@ void MakeSpinSPlot::computeSWeight(){
       (*varIt)->setVal( ((RooRealVar*)set->find((*varIt)->GetName()))->getVal() );
     }
     specIt = __speciesNames.begin();
+
     for(; specIt != __speciesNames.end(); specIt++){ // loop over the species
       int iRow = specIt - __speciesNames.begin();
-
+       
       double num=0;
       std::vector<RooAbsPdf*>::iterator pdfIt = __pdfs.begin();
       for(; pdfIt != __pdfs.end(); pdfIt++){
 	int iCol = pdfIt - __pdfs.begin();
 	
 	num += (*__covMatrix)[iRow][iCol] * ((*pdfIt)->getVal(__observables));
-      }
+//	cout<<(*__covMatrix)[iRow][iCol]<<"   "<<(*pdfIt)->getVal(__observables)<<endl;
+     }
       double denom = computeDenom();
+//      cout<<num<<endl;
       ((RooRealVar*)__sWeightVars->find( Form( "%s_sw", specIt->Data()) ))->setVal(num/denom);
     }//end loop over species
-
+//    cout<<"mass is "<<__variables[0]->getVal()<<"     pdf is "<<__pdfs[0]->getVal(__observables)<<endl;
     __sWeightDataSet->add(*__sWeightVars);
+//    cout<<__sWeightDataSet->get(iEntry)->getRealValue("signal_sw")<<endl;
   }  //end while loop
 
 }

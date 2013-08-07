@@ -18,20 +18,24 @@
 #include <TRandom3.h>
 #include <TF1.h>
 
-#include "analyzerSpin.h"
-#include "librarySpin.h"
+#include "../include/analyzerSpin.h"
+#include "librarySpin.cc"
 
 using namespace std;
 
 void HggSpin::Loop(TString filename)
 {
-   TFile *outputFile = new TFile(filename, "recreate");
+   TFile *outputFile = new TFile("./lib/"+filename, "recreate");
    TTree *tree = new TTree("tree","");
-   Float_t dipho_mass;
-   Float_t max_eta;
-   TBranch *mass = tree->Branch("mass",&dipho_mass,"dipho_mass/F");
-   TBranch *maxEta = tree->Branch("maxEta",&max_eta,"max_eta/F");
-
+   Float_t mass;
+   Float_t maxEta;
+   Float_t pt1;
+   Float_t pt2;
+   tree->Branch("mass",&mass,"mass/F");
+   tree->Branch("maxEta",&maxEta,"maxEta/F");
+   tree->Branch("pt1",&pt1,"pt1/F");
+   tree->Branch("pt2",&pt2,"pt2/F");
+   
    Long_t nEvents = chain->GetEntries();
    cout<<"number of MC events is "<<nEvents<<endl;
    const int nTop = 2;
@@ -66,17 +70,17 @@ void HggSpin::Loop(TString filename)
 
       } // end loop over particles in a given event
 
-      if(top_pt[0] < 26.) continue;
-      if(top_pt[1] < 16.) continue; // there aren't two photons in event
+      if(top_pt[1] == 0.) continue; // there aren't two photons in event
  
       TLorentzVector gamma1, gamma2, higgs;
       gamma1.SetPtEtaPhiM(top_pt[0], top_eta[0], top_phi[0], 0);
       gamma2.SetPtEtaPhiM(top_pt[1], top_eta[1], top_phi[1], 0);
       higgs = gamma1 + gamma2;
 
-      dipho_mass = higgs.M();
-      max_eta = max(fabs(gamma1.Eta()), fabs(gamma2.Eta()));
-
+      mass = higgs.M();
+      maxEta = max(fabs(gamma1.Eta()), fabs(gamma2.Eta()));
+      pt1=gamma1.Pt();
+      pt2=gamma2.Pt();
       tree->Fill();
    } // end loop over events
 
