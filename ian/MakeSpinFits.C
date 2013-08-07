@@ -851,17 +851,13 @@ RooAbsPdf* MakeSpinFits::Make2DSignalModel(TString massMcName,TString costMcName
 
 RooAbsPdf* MakeSpinFits::Make2DBkgModel(TString massMcName,TString costMcName,TString catTag,TString inset){return 0;}
 */
+
 void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float cosThigh,bool fitMCbackground){
   std::cout << "MakeSpinFits::MakeBackgroundOnlyFit" <<std::endl;
   if(ws==0) return;
   RooRealVar mass = *(ws->var("mass"));
   cout << "1" <<endl;
   
-  //### MakeBackground Function ###//
-  RooDataSet Background_Combined("Background_Combined");
-  for(std::vector<TString>::iterator lblit = lblvec.begin(); lblit != lblvec.end(); ++lblit){
-    Background_Combined.append(*lblit + "_Combined");
-      }
 
   TString dataTag="Data";
   if(fitMCbackground) dataTag="Background";
