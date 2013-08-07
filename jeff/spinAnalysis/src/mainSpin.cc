@@ -7,7 +7,7 @@
 
 // ROOT includes
 
-//#include <TROOT.h>
+#include <TROOT.h>
 #include <TFile.h>
 #include <TString.h>
 #include <TTree.h>
@@ -36,10 +36,10 @@ int main()
    int allMC = atoi(cfgReader.getParameter("allMC").c_str());
    int EB_res = atoi(cfgReader.getParameter("EB_res").c_str());
    int EE_res = atoi(cfgReader.getParameter("EE_res").c_str());
-   int lumi = atoi(cfgReader.getParameter("lumi").c_str());
+   float lumi = (float)atoi(cfgReader.getParameter("lumi").c_str());
    int energy = atoi(cfgReader.getParameter("energy").c_str());
    int n_bkg = atoi(cfgReader.getParameter("n_bkg").c_str());
-
+   TString plot_dir = cfgReader.getParameter("plot_dir").c_str();
 
 
    if(runMC)
@@ -52,10 +52,12 @@ int main()
 
 
    Class2* obj = new Class2();
-   obj->setEtaRanges();
+//   obj->setEtaRanges();
+   obj->calculateNSignal(lumi, n_bkg);
    obj->fitMC();
    obj->generate();
-   obj->extract();
-   obj->plot();
+   obj->determineYield();
+   obj->extractSignal();
+   obj->plot(plot_dir);
 
 }

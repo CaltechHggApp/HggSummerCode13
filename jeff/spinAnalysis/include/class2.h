@@ -30,7 +30,6 @@
 #include <numeric>
 #include <vector>
 
-#include "MakeSpinSPlot.C"
 
 using namespace std;
 using namespace RooFit;
@@ -59,21 +58,31 @@ public:
 
    RooRealVar *maxEta;
 
-
+/*
    vector< pair<float,float> > etaRange;
    vector<double> signalWidth;
    vector<double> signalEfficiency;
+*/
+   float signalWidth;
+   float signalEfficiency;
+
+   float signalYield;
+   float backgroundYield;
+   double nSignal;
+   double nBkg;
 
    RooDataSet *toyData;
    RooDataSet *extractedData;
 
    Class2();
    ~Class2();
-   void setEtaRanges();
+//   void setEtaRanges();
+   void calculateNSignal(float, float);
    void fitMC();
    void generate();
-   void extract();
-   void plot();
+   void determineYield();
+   void extractSignal();
+   void plot(TString);
 
 };
 
@@ -85,7 +94,7 @@ Class2::Class2()
    model_sig_mass = new RooGaussian("model_sig_mass","",*mass,*mean_sig_mass,*sigma_sig_mass);
 
    cosT = new RooRealVar("cosT","",0.,1.);
-   p1_sig_cosT = new RooRealVar("p1_sig_cosT",0,-2,2);
+   p1_sig_cosT = new RooRealVar("p1_sig_cosT","",0,-2,2);
    model_sig_cosT = new RooPolynomial ("model_sig_cosT","",*cosT,RooArgList(*p1_sig_cosT));
    
    c_bkg_mass = new RooRealVar("c_bkg_mass","",-.05,-5,5);
@@ -116,6 +125,7 @@ Class2::~Class2()
    delete maxEta;
 }
 
+/*
 void Class2::setEtaRanges()
 {
    pair <float,float> range1;
@@ -149,3 +159,4 @@ void Class2::setEtaRanges()
    etaRange.push_back(range5);
    etaRange.push_back(range6);
 }
+*/

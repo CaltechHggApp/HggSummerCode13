@@ -29,9 +29,13 @@ void HggSpin::Loop(TString filename)
    TTree *tree = new TTree("tree","");
    Float_t mass;
    Float_t maxEta;
+   Float_t pt1;
+   Float_t pt2;
    tree->Branch("mass",&mass,"mass/F");
    tree->Branch("maxEta",&maxEta,"maxEta/F");
-
+   tree->Branch("pt1",&pt1,"pt1/F");
+   tree->Branch("pt2",&pt2,"pt2/F");
+   
    Long_t nEvents = chain->GetEntries();
    cout<<"number of MC events is "<<nEvents<<endl;
    const int nTop = 2;
@@ -66,8 +70,7 @@ void HggSpin::Loop(TString filename)
 
       } // end loop over particles in a given event
 
-      if(top_pt[0] < 26.) continue;
-      if(top_pt[1] < 16.) continue; // there aren't two photons in event
+      if(top_pt[1] == 0.) continue; // there aren't two photons in event
  
       TLorentzVector gamma1, gamma2, higgs;
       gamma1.SetPtEtaPhiM(top_pt[0], top_eta[0], top_phi[0], 0);
@@ -76,7 +79,8 @@ void HggSpin::Loop(TString filename)
 
       mass = higgs.M();
       maxEta = max(fabs(gamma1.Eta()), fabs(gamma2.Eta()));
-
+      pt1=gamma1.Pt();
+      pt2=gamma2.Pt();
       tree->Fill();
    } // end loop over events
 
