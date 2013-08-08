@@ -42,6 +42,8 @@ const int nbackground = 10000;
 class Class2 {
 public:
 
+   RooWorkspace *ws;
+
    RooRealVar *mass;
    RooRealVar *mean_sig_mass;
    RooRealVar *sigma_sig_mass;
@@ -94,6 +96,7 @@ public:
 
 Class2::Class2()
 {
+   ws = new RooWorkspace("ws","");
    mass = new RooRealVar("mass","",110,150);
    mass->setBins(30);
    mean_sig_mass = new RooRealVar("mean_sig_mass","",125,80,160);
