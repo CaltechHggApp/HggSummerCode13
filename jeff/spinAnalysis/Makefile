@@ -26,7 +26,7 @@ INCLUDEDIRROOFIT = $(ROOFITSYS)/include/
 CXX	         += -I$(INCLUDEDIR) -I$(INCLUDEDIRCOMMON) -I. -I$(INCLUDEDIRROOFIT)
 
 
-run: src/mainSpin.cc src/MakeSpinSPlot.C src/class2.cc
+run: src/mainSpin.cc src/MakeSpinSPlot.C src/class2.cc config.cfg src/analyzerSpin.cc
 	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -o run  $(GLIBS) $ $<	
 
 

@@ -68,10 +68,10 @@ public :
    TBranch        *b_Vertex_;
 
 
-   HggSpin(TTree *tree=0);
+   HggSpin(TTree*);
    ~HggSpin();
-   void Init_8tev(TTree *tree);
-   void Init_14tev(TTree *tree);
+   void Init_vecbos(TTree *tree);
+   void Init_bacon(TTree *tree);
    void Loop(TString);
    void GetEntry(Long64_t);
 
@@ -85,11 +85,11 @@ HggSpin::HggSpin(TTree *tree)
    }
    if(strcmp(tree->GetName(),"ntp1") == 0)
    {
-      Init_8tev(tree);
+      Init_vecbos(tree);
    }
    if(strcmp(tree->GetName(),"Events") == 0)
    {
-      Init_14tev(tree);
+      Init_bacon(tree);
    }
 }
 
@@ -97,7 +97,7 @@ HggSpin::~HggSpin()
 {
 }
 
-void HggSpin::Init_8tev(TTree *tree)
+void HggSpin::Init_vecbos(TTree *tree)
 {
    chain = tree;
 
@@ -111,7 +111,7 @@ void HggSpin::Init_8tev(TTree *tree)
    chain->SetBranchAddress("statusMc", statusMc);
 }
 
-void HggSpin::Init_14tev(TTree *tree)
+void HggSpin::Init_bacon(TTree *tree)
 {
    chain = tree;
    chain->SetMakeClass(1);
