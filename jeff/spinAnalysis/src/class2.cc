@@ -6,15 +6,14 @@ void Class2::calculateNSignal(float lumi, float nbkg)
 {
    double crossSection = 49.85e-12;
    double BR = 2.28e-3;
-   nSignal = 1000;//lumi * 1.0e15 * crossSection * BR;
-   nBkg = nbkg;
-//   cout<<"sig and bkg are "<<nSignal<<" "<<nBkg<<endl;
+   nSignal_gen = 1000;//lumi * 1.0e15 * crossSection * BR;
+   nBackground_gen = nbkg;
 }
 
 
 void Class2::create_signal_pdfs()
 {
-   TFile *f = new TFile("./lib/MC_output_2.root");
+   TFile *f = new TFile("./lib/MC_output_0.root");
    TTree *tree = (TTree*)f->Get("tree");
 
    RooRealVar *pt1 = new RooRealVar("pt1","",0,500);
@@ -30,7 +29,7 @@ void Class2::create_signal_pdfs()
       if(event->getRealValue("pt1")<24) continue;
       if(event->getRealValue("pt2")<16) continue;
       double max_eta = event->getRealValue("maxEta");
-      if (max_eta>4.0) continue;
+      if (max_eta>3.0) continue;
       
       mass->setVal(event->getRealValue("mass"));
       cosT->setVal(event->getRealValue("cosT"));
@@ -41,23 +40,52 @@ void Class2::create_signal_pdfs()
    signalWidth = sigma_sig_mass->getVal();
    signalEfficiency = (float)acceptedData->numEntries() / (float)nEntries;
 
-   RooDataHist hist("hist","",*cosT, *(acceptedData->reduce("cosT")));
+   RooDataHist hist0("hist0","",*cosT, *(acceptedData->reduce("cosT")));
 
-   model_sig_cosT2 = new RooHistPdf("model_sig_cosT2","",*cosT,hist);
+   model_sig0_cosT = new RooHistPdf("model_sig0_cosT","",*cosT,hist0);
 
 
 
    genData_sig_cosT = new RooDataSet("genData_sig_cosT","",*cosT);
-   genData_sig_cosT=model_sig_cosT2->generate(*cosT,1000,AutoBinned(false));
-   cout<<genData_sig_cosT->numEntries()<<endl;
-   cout<<genData_sig_cosT->get(343)->getRealValue("cosT")<<endl;
-   cout<<genData_sig_cosT<<endl;
+   genData_sig_cosT=model_sig0_cosT->generate(*cosT,nSignal_gen,AutoBinned(false));
+   cout<<"generated "<<genData_sig_cosT->numEntries()<<" signal cosT events"<<endl;
 
    RooPlot* frame = cosT->frame();
    genData_sig_cosT->plotOn(frame);
    TCanvas c1;
    frame->Draw();
-   c1.SaveAs("rawr.pdf");
+   c1.SaveAs("gen_cos_sig.pdf");
+}
+
+void Class2::create_spin2_pdf()
+{
+   TFile *f = new TFile("./lib/MC_output_2.root");
+   TTree *tree2 = (TTree*)f->Get("tree");
+
+   RooRealVar *pt1 = new RooRealVar("pt1","",0,500);
+   RooRealVar *pt2 = new RooRealVar("pt2","",0,500);
+   RooDataSet *MC = new RooDataSet("MC","",RooArgSet(*mass,*cosT,*maxEta,*pt1,*pt2),Import(*tree2));
+   RooDataSet *acceptedData = new RooDataSet("acceptedData","",RooArgSet(*mass,*cosT));
+
+   const RooArgSet *event;
+   int nEntries=MC->numEntries();
+   for(int i=0; i<nEntries; i++)
+   {
+      event = MC->get(i);
+      if(event->getRealValue("pt1")<24) continue;
+      if(event->getRealValue("pt2")<16) continue;
+      double max_eta = event->getRealValue("maxEta");
+      if (max_eta>3.0) continue;
+
+      mass->setVal(event->getRealValue("mass"));
+      cosT->setVal(event->getRealValue("cosT"));
+      acceptedData->add(RooArgSet(*mass,*cosT));
+   }
+
+   RooDataHist hist2("hist2","",*cosT, *(acceptedData->reduce("cosT")));
+
+   model_sig2_cosT = new RooHistPdf("model_sig2_cosT","",*cosT,hist2);
+
 }
 
 
@@ -71,18 +99,13 @@ void Class2::generate()
 
    toyData = new RooDataSet("toyData","",event);
 
-   int create_n = (int)round(nSignal * signalEfficiency);
+   int create_n = (int)round(nSignal_gen);//; * signalEfficiency);
    RooDataSet *genData_sig_mass;
-//   RooDataSet *genData_sig_cosT;
 
-   cout<<"hi"<<endl;
-//   cout<<model_sig_cosT2->getVal()<<endl;
    sigma_sig_mass->setVal(signalWidth);
    genData_sig_mass = model_sig_mass->generate(*mass,create_n);
-//   genData_sig_cosT = model_sig_cosT2->generate(*cosT,create_n,AutoBinned(false));
-   cout<<genData_sig_cosT->numEntries()<<endl;
-   cout<<"get here"<<endl;
-   genData_sig_cosT->get(3);
+   cout<<"generated "<<genData_sig_mass->numEntries()<<" signal mass events"<<endl;
+
    cout<<"generating "<<create_n<<" signal events"<<endl;
    for(int i=0; i<create_n; i++)
    {
@@ -93,14 +116,15 @@ void Class2::generate()
 
    RooDataSet *genData_bkg_mass = model_bkg_mass->generate(*mass,nbackground);
    RooDataSet *genData_bkg_cosT = model_bkg_cosT->generate(*cosT,nbackground);
-/*
-   for(int i=0; i<nBkg; i++)
+
+   cout<<"generating background events"<<endl;
+   for(int i=0; i<nBackground_gen; i++)
    {
       mass->setVal(genData_bkg_mass->get(i)->getRealValue("mass"));
       cosT->setVal(genData_bkg_cosT->get(i)->getRealValue("cosT"));
       toyData->add(event);
    }
-*/
+
 }
 
 void Class2::determineYield()

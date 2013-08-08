@@ -26,7 +26,6 @@ void MakeSpinSPlot::createObservables(){
 }
 
 void MakeSpinSPlot::computeCovMatrix(){
-
   __covMatrix = new TMatrixD(__nSpec,__nSpec);
 
   std::cout << "Entries: "<< __dataSet->sumEntries() <<std::endl;
@@ -125,7 +124,7 @@ void MakeSpinSPlot::computeSWeight(){
     }//end loop over species
 //    cout<<"mass is "<<__variables[0]->getVal()<<"     pdf is "<<__pdfs[0]->getVal(__observables)<<endl;
     __sWeightDataSet->add(*__sWeightVars);
-//    cout<<__sWeightDataSet->get(iEntry)->getRealValue("signal_sw")<<endl;
+//    cout<<"mass is "<<__variables[0]->getVal()<<" sig sweight is "<<__sWeightDataSet->get(iEntry)->getRealValue("signal_sw")<<endl;
   }  //end while loop
 
 }

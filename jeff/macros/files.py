@@ -9,13 +9,14 @@ import os
 
 outputFile = open('chain.txt', 'w')
 
-inputFile = open('/home/amott/tmp_data/GluGluToHToGG_M-125_14TeV-powheg-pythia6_Summer12-PU50_POSTLS161_V12-v1.list', 'r')
-#directory = "/mnt/tier2/store/user/amott/Vecbos2012/MC/V00-5_3_X/GluGluToHToGG_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/"
+inputFile = open('/home/amott/HggApp/Hgg_53X/Caltech/Graviton2PMGluGluToHToGG_M-125_8TeV-jhu-pythia6__Summer12_DR53X-PU_S10_START53_V7C-v1.list', 'r')
 
+#directory = "/mnt/tier2/store/user/amott/Vecbos2012/MC/V00-5_3_X/GluGluToHToGG_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/"
 #files = os.listdir(directory)
+#for file in files:
 
 for file in inputFile:
-    line = 'chain->Add(\"' + file[:-1] + '\");\n'
+    line = '         chain->Add(directory + \"' + file[140:-1] + '\");\n'
     outputFile.write(line)
 
 outputFile.close()

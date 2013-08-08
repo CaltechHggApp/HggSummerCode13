@@ -82,8 +82,7 @@ TTree* makeTree(int spin, int all)
    {
       chain->SetName("ntp1");
 
-      TString directory = "/mnt/tier2/store/user/amott/Vecbos2012/MC/V00-5_3_X/GluGluToHToG\
-G_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/";
+      TString directory = "/mnt/tier2/store/user/amott/Vecbos2012/MC/V00-5_3_X/GluGluToHToGG_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/";
       chain->Add(directory + "default_MC_10_1_nt4.root");
       if (all)
       {
@@ -115,8 +114,7 @@ G_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/";
    {
       chain->SetName("Events");
 
-      TString directory = "/mnt/tier2/store/user/amott/LiteFormat2013/MC/V03-6_1_2_SLHC4_pa\
-tch2/GluGluToHToGG_M-125_14TeV-powheg-pythia6/Summer12-PU50_POSTLS161_V12-v1//";
+      TString directory = "/mnt/tier2/store/user/amott/LiteFormat2013/MC/V03-6_1_2_SLHC4_patch2/GluGluToHToGG_M-125_14TeV-powheg-pythia6/Summer12-PU50_POSTLS161_V12-v1//";
       chain->Add(directory + "BACONNtuple_10_1_lLB.root");
       if(all)
       {
@@ -155,15 +153,43 @@ tch2/GluGluToHToGG_M-125_14TeV-powheg-pythia6/Summer12-PU50_POSTLS161_V12-v1//";
    {
       chain->SetName("ntp1");
 
-//      TString directory = "/mnt/tier2/store/user/apresyan/Vecbos2012/MC/V06-5_3_X/Graviton2PMGluGluToHToGG_M-125_8TeV-jhu-pythia6/Summer12_DR53X-PU_S10_START53_V7C-v1/";
-      TString directory = "~/";
+      TString directory = "/mnt/tier2/store/user/apresyan/Vecbos2012/MC/V06-5_3_X/Graviton2PMGluGluToHToGG_M-125_8TeV-jhu-pythia6/Summer12_DR53X-PU_S10_START53_V7C-v1/";
+//      TString directory = "~/";
 
-      chain->Add(directory + "default_MC_27_1_fzS.root");
+      chain->Add(directory + "default_MC_10_1_ZiX.root");
       if (all)
       {
-//         chain->Add(directory + "default_MC_11_1_UJo.root");
-//         chain->Add(directory + "default_MC_1_1_ZVS.root");
+         chain->Add(directory + "default_MC_11_1_0fA.root");
+         chain->Add(directory + "default_MC_12_1_BpX.root");
+         chain->Add(directory + "default_MC_13_1_qCK.root");
+         chain->Add(directory + "default_MC_14_1_Rvl.root");
+         chain->Add(directory + "default_MC_15_1_tE7.root");
+         chain->Add(directory + "default_MC_16_1_et9.root");
+         chain->Add(directory + "default_MC_17_1_XyL.root");
+         chain->Add(directory + "default_MC_18_1_4Pf.root");
+         chain->Add(directory + "default_MC_19_1_NjC.root");
+         chain->Add(directory + "default_MC_1_1_33z.root");
+         chain->Add(directory + "default_MC_20_1_0Fd.root");
+         chain->Add(directory + "default_MC_21_1_Dpj.root");
+         chain->Add(directory + "default_MC_22_1_SGf.root");
+         chain->Add(directory + "default_MC_23_1_IsH.root");
+         chain->Add(directory + "default_MC_24_1_EJQ.root");
+         chain->Add(directory + "default_MC_25_1_jGg.root");
+         chain->Add(directory + "default_MC_26_1_a3T.root");
+         chain->Add(directory + "default_MC_27_1_fzS.root");
+         chain->Add(directory + "default_MC_28_1_LI2.root");
+         chain->Add(directory + "default_MC_29_1_4P0.root");
+         chain->Add(directory + "default_MC_2_1_qCO.root");
+         chain->Add(directory + "default_MC_30_1_13f.root");
+         chain->Add(directory + "default_MC_31_1_iMx.root");
+         chain->Add(directory + "default_MC_3_1_3Ha.root");
+         chain->Add(directory + "default_MC_4_1_lm4.root");
+         chain->Add(directory + "default_MC_5_1_rUJ.root");
+         chain->Add(directory + "default_MC_6_1_OWc.root");
+         chain->Add(directory + "default_MC_7_1_3m7.root");
+         chain->Add(directory + "default_MC_8_1_Gum.root");
+         chain->Add(directory + "default_MC_9_1_VGH.root");
       }
-   return chain;
    }
+   return chain;
 }
