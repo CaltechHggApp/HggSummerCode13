@@ -95,6 +95,7 @@ HggSpin::HggSpin(TTree *tree)
 
 HggSpin::~HggSpin()
 {
+   delete chain;
 }
 
 void HggSpin::Init_vecbos(TTree *tree)

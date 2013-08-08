@@ -49,24 +49,25 @@ int main()
    {
       cout<<"Running over spin0 MC"<<endl;
       TTree *tree0 = makeTree(0, allMC); 
-      HggSpin* analyzer0 = new HggSpin(tree0);
-      analyzer0->Loop("MC_output_0.root");
+      HggSpin analyzer0(tree0);
+      analyzer0.Loop("MC_output_0.root");
       
       cout<<"Running over spin2 MC"<<endl;
       TTree *tree2 = makeTree(2,allMC);
-      HggSpin* analyzer2 = new HggSpin(tree2);
-      analyzer2->Loop("MC_output_2.root");
+      HggSpin analyzer2(tree2);
+      analyzer2.Loop("MC_output_2.root");
    }
 
 
-   Class2* obj = new Class2();
-   obj->setNBins(nBins);
-   obj->calculateNSignal(lumi, n_bkg);
-   obj->create_signal_pdfs();
-   obj->create_spin2_pdf();
-   obj->generate();
-   obj->determineYield();
-   obj->extractSignal();
-   obj->plot(plot_dir);
+   Class2 obj;
+   obj.setNBins(nBins);
+   obj.setNSignal(lumi, n_bkg);
+   obj.create_signal_pdfs();
+   obj.create_spin2_pdf();
+   obj.generate();
+   obj.determineYield();
+   obj.extractSignal();
+   obj.plot(plot_dir);
 
+   return 0;
 }
