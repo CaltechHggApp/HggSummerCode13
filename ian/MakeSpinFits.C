@@ -852,6 +852,14 @@ RooAbsPdf* MakeSpinFits::Make2DSignalModel(TString massMcName,TString costMcName
 RooAbsPdf* MakeSpinFits::Make2DBkgModel(TString massMcName,TString costMcName,TString catTag,TString inset){return 0;}
 */
 
+void MakeSpinFits::MakeBackground(){
+  RooDataSet Background_Combined(*(ws->data("Data_Combined")),"Background");
+  for (auto mcIt=mcLabel.begin(); mcIt != mcLabel.end(); mcIt++){
+    append(*(ws->data(*mcIt+"_Combined")),*mcIt);
+  }
+}
+
+
 void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float cosThigh,bool fitMCbackground){
   std::cout << "MakeSpinFits::MakeBackgroundOnlyFit" <<std::endl;
   if(ws==0) return;
@@ -1035,6 +1043,9 @@ void MakeSpinFits::run(){
   std::cout << "\n\n\nMakeSpinFits::run\n\n\n" <<std::endl;
   if(ws==0) return;
   RooMsgService::instance().setSilentMode(true);
+  
+  //Create Background_Combined from MakeBackground
+  MakeBackground();
 
   RooCategory cosThetaBins("CosThetaBins","CosThetaBins");
   for(int i=0;i<NcosTbins;i++){
