@@ -1,45 +1,66 @@
 #include "../include/class2.h"
-#include "MakeSpinSplot.C"
+#include "MakeSpinSPlot.C"
 
 
 void Class2::calculateNSignal(float lumi, float nbkg)
 {
-   double sigma = 49.85e-12;
+   double crossSection = 49.85e-12;
    double BR = 2.28e-3;
-   nSignal = 1000;//lumi * 1.0e15 * sigma * BR;
+   nSignal = 1000;//lumi * 1.0e15 * crossSection * BR;
    nBkg = nbkg;
 //   cout<<"sig and bkg are "<<nSignal<<" "<<nBkg<<endl;
 }
 
 
-void Class2::fitMC()
+void Class2::create_signal_pdfs()
 {
-   TFile *f = new TFile("./lib/histos8.root");
+   TFile *f = new TFile("./lib/MC_output_2.root");
    TTree *tree = (TTree*)f->Get("tree");
 
    RooRealVar *pt1 = new RooRealVar("pt1","",0,500);
    RooRealVar *pt2 = new RooRealVar("pt2","",0,500);
-   RooDataSet *MC = new RooDataSet("MC","",RooArgSet(*mass,*maxEta,*pt1,*pt2),Import(*tree));
-   RooDataSet *acceptedData = new RooDataSet("acceptedData","",*mass);
+   RooDataSet *MC = new RooDataSet("MC","",RooArgSet(*mass,*cosT,*maxEta,*pt1,*pt2),Import(*tree));
+   RooDataSet *acceptedData = new RooDataSet("acceptedData","",RooArgSet(*mass,*cosT));
 
    const RooArgSet *event;
    int nEntries=MC->numEntries();
    for(int i=0; i<nEntries; i++)
    {
       event = MC->get(i);
-//      if(event->getRealValue("pt1")<24) continue;
-//      if(event->getRealValue("pt2")<16) continue;
+      if(event->getRealValue("pt1")<24) continue;
+      if(event->getRealValue("pt2")<16) continue;
       double max_eta = event->getRealValue("maxEta");
       if (max_eta>4.0) continue;
       
       mass->setVal(event->getRealValue("mass"));
-      acceptedData->add(*mass);
+      cosT->setVal(event->getRealValue("cosT"));
+      acceptedData->add(RooArgSet(*mass,*cosT));
    }
     
-   model_sig_mass->fitTo(*acceptedData,PrintLevel(-1));
+   model_sig_mass->fitTo(*(acceptedData->reduce("mass")),PrintLevel(-1));
    signalWidth = sigma_sig_mass->getVal();
    signalEfficiency = (float)acceptedData->numEntries() / (float)nEntries;
+
+   RooDataHist hist("hist","",*cosT, *(acceptedData->reduce("cosT")));
+
+   model_sig_cosT2 = new RooHistPdf("model_sig_cosT2","",*cosT,hist);
+
+
+
+   genData_sig_cosT = new RooDataSet("genData_sig_cosT","",*cosT);
+   genData_sig_cosT=model_sig_cosT2->generate(*cosT,1000,AutoBinned(false));
+   cout<<genData_sig_cosT->numEntries()<<endl;
+   cout<<genData_sig_cosT->get(343)->getRealValue("cosT")<<endl;
+   cout<<genData_sig_cosT<<endl;
+
+   RooPlot* frame = cosT->frame();
+   genData_sig_cosT->plotOn(frame);
+   TCanvas c1;
+   frame->Draw();
+   c1.SaveAs("rawr.pdf");
 }
+
+
 
 
 void Class2::generate()
@@ -50,14 +71,19 @@ void Class2::generate()
 
    toyData = new RooDataSet("toyData","",event);
 
-   int create_n = (int)round(3 * nSignal * signalEfficiency);
+   int create_n = (int)round(nSignal * signalEfficiency);
    RooDataSet *genData_sig_mass;
-   RooDataSet *genData_sig_cosT;
+//   RooDataSet *genData_sig_cosT;
 
+   cout<<"hi"<<endl;
+//   cout<<model_sig_cosT2->getVal()<<endl;
    sigma_sig_mass->setVal(signalWidth);
    genData_sig_mass = model_sig_mass->generate(*mass,create_n);
-   genData_sig_cosT = model_sig_cosT->generate(*cosT,create_n);
-   cout<<"generating "<<create_n<<"signal events"<<endl;
+//   genData_sig_cosT = model_sig_cosT2->generate(*cosT,create_n,AutoBinned(false));
+   cout<<genData_sig_cosT->numEntries()<<endl;
+   cout<<"get here"<<endl;
+   genData_sig_cosT->get(3);
+   cout<<"generating "<<create_n<<" signal events"<<endl;
    for(int i=0; i<create_n; i++)
    {
       mass->setVal(genData_sig_mass->get(i)->getRealValue("mass"));
@@ -67,14 +93,14 @@ void Class2::generate()
 
    RooDataSet *genData_bkg_mass = model_bkg_mass->generate(*mass,nbackground);
    RooDataSet *genData_bkg_cosT = model_bkg_cosT->generate(*cosT,nbackground);
-
+/*
    for(int i=0; i<nBkg; i++)
    {
       mass->setVal(genData_bkg_mass->get(i)->getRealValue("mass"));
       cosT->setVal(genData_bkg_cosT->get(i)->getRealValue("cosT"));
       toyData->add(event);
    }
-
+*/
 }
 
 void Class2::determineYield()
@@ -124,28 +150,28 @@ void Class2::extractSignal()
 
 void Class2::plot(TString plot_dir = "./plots")
 {
-   RooPlot* frame1 = cosT->frame(Bins(40));
+   RooPlot* frame1 = cosT->frame();
    extractedData->reduce("cosT")->plotOn(frame1);
    extractedData->statOn(frame1,Layout(0.55,0.99,0.8));
    TCanvas c1;
    frame1->Draw();
    c1.SaveAs(plot_dir+"/extracted_sig_cosT.pdf");
 
-   RooPlot* frame2 = mass->frame(Bins(40));
+   RooPlot* frame2 = mass->frame();
    extractedData->reduce("mass")->plotOn(frame2);
    extractedData->statOn(frame2,Layout(0.55,0.99,0.8));
    TCanvas c2;
    frame2->Draw();
    c2.SaveAs(plot_dir+"/extracted_sig_mass.pdf");
 
-   RooPlot* frame3 = cosT->frame(Bins(40));
+   RooPlot* frame3 = cosT->frame();
    toyData->reduce("cosT")->plotOn(frame3);
    toyData->statOn(frame3,Layout(0.55,0.99,0.8));
    TCanvas c3;
    frame3->Draw();
    c3.SaveAs(plot_dir+"/toyData_cosT.pdf");
 
-   RooPlot* frame4 = mass->frame(Bins(40));
+   RooPlot* frame4 = mass->frame();
    toyData->reduce("mass")->plotOn(frame4);
    toyData->statOn(frame4,Layout(0.55,0.99,0.8));
    TCanvas c4;

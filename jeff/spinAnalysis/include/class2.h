@@ -21,6 +21,8 @@
 #include "RooSimultaneous.h"
 #include "RooExtendPdf.h"
 #include "RooRandom.h"
+#include "RooDataHist.h"
+#include "RooHistPdf.h"
 
 #include "TMatrixT.h"
 #include "TMath.h"
@@ -48,6 +50,8 @@ public:
    RooRealVar *cosT;
    RooRealVar *p1_sig_cosT;
    RooPolynomial *model_sig_cosT;
+   RooHistPdf *model_sig_cosT2;
+   RooDataSet *genData_sig_cosT;
 
    RooRealVar *c_bkg_mass;
    RooExponential *model_bkg_mass;
@@ -78,7 +82,7 @@ public:
    ~Class2();
 //   void setEtaRanges();
    void calculateNSignal(float, float);
-   void fitMC();
+   void create_signal_pdfs();
    void generate();
    void determineYield();
    void extractSignal();
@@ -89,11 +93,13 @@ public:
 Class2::Class2()
 {
    mass = new RooRealVar("mass","",110,150);
+   mass->setBins(30);
    mean_sig_mass = new RooRealVar("mean_sig_mass","",125,80,160);
    sigma_sig_mass = new RooRealVar("sigma_sig_mass","",2,0,10);
    model_sig_mass = new RooGaussian("model_sig_mass","",*mass,*mean_sig_mass,*sigma_sig_mass);
 
    cosT = new RooRealVar("cosT","",0.,1.);
+   cosT->setBins(10);
    p1_sig_cosT = new RooRealVar("p1_sig_cosT","",0,-2,2);
    model_sig_cosT = new RooPolynomial ("model_sig_cosT","",*cosT,RooArgList(*p1_sig_cosT));
    

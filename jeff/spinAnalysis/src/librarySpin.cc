@@ -73,10 +73,12 @@ Float_t calculateAngle_cs(TLorentzVector gamma1, TLorentzVector gamma2)
 
 
 
-TTree* makeTree(int dataset, int all)
+TTree* makeTree(int spin, int all)
 {
+   int energy_0 = 14;
+   int energy_2 = 8;
    TChain *chain = new TChain();
-   if(dataset == 8)
+   if(spin == 0 && energy_0 ==8)
    {
       chain->SetName("ntp1");
 
@@ -109,7 +111,7 @@ G_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/";
       }
    }
 
-   if(dataset == 14)
+   if(spin == 0 && energy_0 ==14)
    {
       chain->SetName("Events");
 
@@ -148,5 +150,20 @@ tch2/GluGluToHToGG_M-125_14TeV-powheg-pythia6/Summer12-PU50_POSTLS161_V12-v1//";
       }
    }
 
+
+   if(spin == 2 && energy_2 ==8)
+   {
+      chain->SetName("ntp1");
+
+//      TString directory = "/mnt/tier2/store/user/apresyan/Vecbos2012/MC/V06-5_3_X/Graviton2PMGluGluToHToGG_M-125_8TeV-jhu-pythia6/Summer12_DR53X-PU_S10_START53_V7C-v1/";
+      TString directory = "~/";
+
+      chain->Add(directory + "default_MC_27_1_fzS.root");
+      if (all)
+      {
+//         chain->Add(directory + "default_MC_11_1_UJo.root");
+//         chain->Add(directory + "default_MC_1_1_ZVS.root");
+      }
    return chain;
+   }
 }

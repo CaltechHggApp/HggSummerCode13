@@ -36,7 +36,9 @@ int main()
    int allMC = atoi(cfgReader.getParameter("allMC").c_str());
    int EB_res = atoi(cfgReader.getParameter("EB_res").c_str());
    int EE_res = atoi(cfgReader.getParameter("EE_res").c_str());
-   float lumi = (float)atoi(cfgReader.getParameter("lumi").c_str());
+   float maxEta = atof(cfgReader.getParameter("maxEta").c_str());
+   float lumi = atof(cfgReader.getParameter("lumi").c_str());
+
    int energy = atoi(cfgReader.getParameter("energy").c_str());
    int n_bkg = atoi(cfgReader.getParameter("n_bkg").c_str());
    TString plot_dir = cfgReader.getParameter("plot_dir").c_str();
@@ -44,17 +46,22 @@ int main()
 
    if(runMC)
    {
-      TString filename = (energy == 8) ? "histos8.root" : "histos14.root";
-      TTree *tree = makeTree(energy, allMC); 
-      HggSpin* t = new HggSpin(tree);
-      t->Loop(filename);
+//      cout<<"Running over spin0 MC"<<endl;
+//      TTree *tree0 = makeTree(0, allMC); 
+//      HggSpin* analyzer0 = new HggSpin(tree0);
+//      analyzer0->Loop("MC_output_0.root");
+      
+      cout<<"Running over spin2 MC"<<endl;
+      TTree *tree2 = makeTree(2,allMC);
+      HggSpin* analyzer2 = new HggSpin(tree2);
+      analyzer2->Loop("MC_output_2.root");
    }
 
 
    Class2* obj = new Class2();
 //   obj->setEtaRanges();
    obj->calculateNSignal(lumi, n_bkg);
-   obj->fitMC();
+   obj->create_signal_pdfs();
    obj->generate();
    obj->determineYield();
    obj->extractSignal();

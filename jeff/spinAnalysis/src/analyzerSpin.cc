@@ -28,10 +28,12 @@ void HggSpin::Loop(TString filename)
    TFile *outputFile = new TFile("./lib/"+filename, "recreate");
    TTree *tree = new TTree("tree","");
    Float_t mass;
+   Float_t cosT;
    Float_t maxEta;
    Float_t pt1;
    Float_t pt2;
    tree->Branch("mass",&mass,"mass/F");
+   tree->Branch("cosT",&cosT,"cosT/F");
    tree->Branch("maxEta",&maxEta,"maxEta/F");
    tree->Branch("pt1",&pt1,"pt1/F");
    tree->Branch("pt2",&pt2,"pt2/F");
@@ -43,6 +45,7 @@ void HggSpin::Loop(TString filename)
    {
       if(i % 10000 == 0) cout<<"Processing event "<<i<<endl;
       GetEntry(i);
+
       Float_t top_pt[nTop] = {0.};
       Float_t top_eta[nTop] = {0.};
       Float_t top_phi[nTop] = {0.};
@@ -51,7 +54,7 @@ void HggSpin::Loop(TString filename)
       {
          if(statusMc[j] != 3) continue;
          if(idMc[j] != 22) continue;
-         if(motherID[j] != 25) continue;
+         if(!( (motherID[j] != 25) || (motherID[j] != 39)) ) continue;
 
          Float_t thisPt = smear(pMc[j], etaMc[j]) * sin(thetaMc[j]);
          Float_t thisEta = etaMc[j];
@@ -78,6 +81,7 @@ void HggSpin::Loop(TString filename)
       higgs = gamma1 + gamma2;
 
       mass = higgs.M();
+      cosT = calculateAngle_cs(gamma1,gamma2);
       maxEta = max(fabs(gamma1.Eta()), fabs(gamma2.Eta()));
       pt1=gamma1.Pt();
       pt2=gamma2.Pt();
