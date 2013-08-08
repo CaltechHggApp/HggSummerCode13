@@ -84,6 +84,7 @@ public:
    Class2();
    ~Class2();
 //   void setEtaRanges();
+   void setNBins(int nbins) { cosT->setBins(nbins);}
    void calculateNSignal(float, float);
    void create_signal_pdfs();
    void create_spin2_pdf();
@@ -135,6 +136,7 @@ Class2::~Class2()
 //   delete model_bkg_cosT;
    delete maxEta;
 }
+
 
 /*
 void Class2::setEtaRanges()

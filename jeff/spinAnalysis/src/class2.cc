@@ -6,8 +6,9 @@ void Class2::calculateNSignal(float lumi, float nbkg)
 {
    double crossSection = 49.85e-12;
    double BR = 2.28e-3;
-   nSignal_gen = 1000;//lumi * 1.0e15 * crossSection * BR;
-   nBackground_gen = nbkg;
+   nSignal_gen = lumi * 1.0e15 * crossSection * BR;
+   nBackground_gen = round(10 * nSignal_gen);
+   cout<<"-number of signal in dataset: "<<nSignal_gen<<endl;
 }
 
 
@@ -98,7 +99,8 @@ void Class2::generate()
 
    toyData = new RooDataSet("toyData","",event);
 
-   int create_n = (int)round(nSignal_gen);//; * signalEfficiency);
+   int create_n = (int)round(nSignal_gen * signalEfficiency);
+   cout<<"-signal acceptance x efficiency is "<<signalEfficiency<<endl;
    RooDataSet *genData_sig_mass;
    RooDataSet *genData_sig_cosT;
 
@@ -106,7 +108,7 @@ void Class2::generate()
    genData_sig_mass = ws->pdf("model_sig_mass")->generate(*mass,create_n);
    genData_sig_cosT = ws->pdf("model_sig0_cosT")->generate(*cosT,create_n,AutoBinned(false));
 
-   cout<<"generating "<<create_n<<" signal events"<<endl;
+   cout<<"-generating "<<create_n<<" signal events"<<endl;
    for(int i=0; i<create_n; i++)
    {
       mass->setVal(genData_sig_mass->get(i)->getRealValue("mass"));
@@ -114,10 +116,10 @@ void Class2::generate()
       toyData->add(event);
    }
 
-   RooDataSet *genData_bkg_mass = ws->pdf("model_bkg_mass")->generate(*mass,nbackground);
-   RooDataSet *genData_bkg_cosT = ws->pdf("model_bkg_cosT")->generate(*cosT,nbackground);
+   RooDataSet *genData_bkg_mass = ws->pdf("model_bkg_mass")->generate(*mass,nBackground_gen);
+   RooDataSet *genData_bkg_cosT = ws->pdf("model_bkg_cosT")->generate(*cosT,nBackground_gen);
 
-   cout<<"generating "<<nBackground_gen<<" background events"<<endl;
+   cout<<"-generating "<<nBackground_gen<<" background events"<<endl;
    for(int i=0; i<nBackground_gen; i++)
    {
       mass->setVal(genData_bkg_mass->get(i)->getRealValue("mass"));
@@ -133,11 +135,11 @@ void Class2::determineYield()
    RooRealVar *bkgYield = new RooRealVar("bkgYield","",0,5 * nbackground);
    RooAddPdf *model_mass = new RooAddPdf("model_mass","",RooArgList( *(ws->pdf("model_sig_mass")), *(ws->pdf("model_bkg_mass")) ),RooArgList(*(sigYield),*(bkgYield)));
    model_mass->fitTo(*toyData,PrintLevel(-1));
-   signalYield = sigYield->getVal();
-   backgroundYield = bkgYield->getVal();
+   signalYield = round(sigYield->getVal());
+   backgroundYield = round(bkgYield->getVal());
 
-   cout<<"\nSignal yield is "<<signalYield<<endl;
-   cout<<"Bkg yield is    "<<backgroundYield<<"\n"<<endl;
+   cout<<"\n-signal yield is "<<signalYield<<endl;
+   cout<<"-background yield is    "<<backgroundYield<<"\n"<<endl;
 }
 
 void Class2::extractSignal()
@@ -175,21 +177,17 @@ void Class2::extractSignal()
 void Class2::plot(TString plot_dir = "./plots")
 {
    RooPlot* frame1 = cosT->frame();
+
+
    RooAbsData *data = extractedData->reduce("cosT");
    data->statOn(frame1,Layout(0.55,0.99,0.8));
-   RooAbsPdf *model_sig0_cosT = ws->pdf("model_sig1_cosT");
-
    RooDataHist hist3("hist3","",*cosT,*data);
    hist3.plotOn(frame1);
-   model_sig0_cosT->plotOn(frame1);
+   RooAbsPdf *model_sig2_cosT = ws->pdf("model_sig2_cosT");
+   model_sig2_cosT->plotOn(frame1);
    TCanvas c1;
    frame1->Draw();
    c1.SaveAs(plot_dir+"/extracted_sig_cosT.pdf");
-
-   double chi2 = frame1->chiSquare(1);
-   cout<<"chi-squared is "<<chi2<<endl;
-
-
 
 
    RooPlot* frame2 = mass->frame();
@@ -212,4 +210,11 @@ void Class2::plot(TString plot_dir = "./plots")
    TCanvas c4;
    frame4->Draw();
    c4.SaveAs(plot_dir+"/toyData_mass.pdf");
+
+
+   double chi2 = frame1->chiSquare();
+   cout<<"\n-chi-squared is "<<chi2<<endl;
+   int dof = cosT->getBins();
+   cout<<"-dof is "<<dof<<endl;
+   cout<<"-pvalue is "<< TMath::Prob(chi2,dof-2)<<endl;
 }

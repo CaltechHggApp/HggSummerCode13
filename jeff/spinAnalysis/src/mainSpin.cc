@@ -38,6 +38,7 @@ int main()
    int EE_res = atoi(cfgReader.getParameter("EE_res").c_str());
    float maxEta = atof(cfgReader.getParameter("maxEta").c_str());
    float lumi = atof(cfgReader.getParameter("lumi").c_str());
+   int nBins = atoi(cfgReader.getParameter("nBins").c_str());
 
    int energy = atoi(cfgReader.getParameter("energy").c_str());
    int n_bkg = atoi(cfgReader.getParameter("n_bkg").c_str());
@@ -59,6 +60,7 @@ int main()
 
 
    Class2* obj = new Class2();
+   obj->setNBins(nBins);
    obj->calculateNSignal(lumi, n_bkg);
    obj->create_signal_pdfs();
    obj->create_spin2_pdf();
