@@ -29,7 +29,7 @@ void MakeSpinSPlot::computeCovMatrix(){
   __covMatrix = new TMatrixD(__nSpec,__nSpec);
 
   std::cout << "Entries: "<< __dataSet->sumEntries() <<std::endl;
-  std::cout << "Covariance Matrix:" << std::endl;
+  std::cout << "Covariance Matrix ^-1:" << std::endl;
   Long64_t iEntry=-1;
   const RooArgSet *set;
   //loop over dataset
@@ -62,13 +62,14 @@ void MakeSpinSPlot::computeCovMatrix(){
     }
     __covMatrix->Invert();
 
-    cout<<"\n after inverting"<<endl;
+    cout<<"\nCovariance matrix"<<endl;
     for(int iRow = 0; iRow<__nSpec;iRow++){
        for(int iCol = 0; iCol<__nSpec;iCol++){
 	  std::cout << (*__covMatrix)[iRow][iCol] << " ";
        }
-       std::cout << std::endl;
+       std::cout<< std::endl;
     }
+    std::cout<<endl;
 
 }
 

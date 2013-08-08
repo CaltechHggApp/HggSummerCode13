@@ -61,7 +61,6 @@ int main()
    Class2* obj = new Class2();
    obj->calculateNSignal(lumi, n_bkg);
    obj->create_signal_pdfs();
-   cout<<"pointer to pdf is "<<obj->model_sig0_cosT<<endl;
    obj->create_spin2_pdf();
    obj->generate();
    obj->determineYield();

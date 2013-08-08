@@ -20,8 +20,6 @@ void Class2::create_signal_pdfs()
 
 
 
-
-
    TFile *f = new TFile("./lib/MC_output_0.root");
    TTree *tree = (TTree*)f->Get("tree");
 
@@ -50,28 +48,8 @@ void Class2::create_signal_pdfs()
    signalEfficiency = (float)acceptedData->numEntries() / (float)nEntries;
 
    RooDataHist hist0("hist0","",*cosT, *(acceptedData->reduce("cosT")));
+   RooHistPdf *model_sig0_cosT = new RooHistPdf("model_sig0_cosT","",*cosT,hist0);
 
-   model_sig0_cosT = new RooHistPdf("model_sig0_cosT","",*cosT,hist0);
-
-
-
-   genData_sig_cosT = new RooDataSet("genData_sig_cosT","",*cosT);
-   genData_sig_cosT=model_sig0_cosT->generate(*cosT,nSignal_gen,AutoBinned(false));
-   cout<<"generated "<<genData_sig_cosT->numEntries()<<" signal cosT events"<<endl;
-
-   RooPlot* frame = cosT->frame();
-   genData_sig_cosT->plotOn(frame);
-   TCanvas c1;
-   frame->Draw();
-   c1.SaveAs("gen_cos_sig.pdf");
-
-/*
-   RooPlot* frame2 = cosT->frame();
-   model_sig0_cosT->plotOn(frame2);
-   TCanvas c2;
-   frame2->Draw();
-   c2.SaveAs("model_sig0_cosT.pdf");
-*/
    ws->import(*model_sig0_cosT);
    ws->import(*model_sig_mass);
    ws->import(*model_bkg_mass);
@@ -105,7 +83,7 @@ void Class2::create_spin2_pdf()
 
    RooDataHist hist2("hist2","",*cosT, *(acceptedData->reduce("cosT")));
 
-   model_sig2_cosT = new RooHistPdf("model_sig2_cosT","",*cosT,hist2);
+   RooHistPdf *model_sig2_cosT = new RooHistPdf("model_sig2_cosT","",*cosT,hist2);
    ws->import(*model_sig2_cosT);
 }
 
@@ -122,10 +100,11 @@ void Class2::generate()
 
    int create_n = (int)round(nSignal_gen);//; * signalEfficiency);
    RooDataSet *genData_sig_mass;
+   RooDataSet *genData_sig_cosT;
 
    sigma_sig_mass->setVal(signalWidth);
    genData_sig_mass = ws->pdf("model_sig_mass")->generate(*mass,create_n);
-   cout<<"generated "<<genData_sig_mass->numEntries()<<" signal mass events"<<endl;
+   genData_sig_cosT = ws->pdf("model_sig0_cosT")->generate(*cosT,create_n,AutoBinned(false));
 
    cout<<"generating "<<create_n<<" signal events"<<endl;
    for(int i=0; i<create_n; i++)
@@ -138,7 +117,7 @@ void Class2::generate()
    RooDataSet *genData_bkg_mass = ws->pdf("model_bkg_mass")->generate(*mass,nbackground);
    RooDataSet *genData_bkg_cosT = ws->pdf("model_bkg_cosT")->generate(*cosT,nbackground);
 
-   cout<<"generating background events"<<endl;
+   cout<<"generating "<<nBackground_gen<<" background events"<<endl;
    for(int i=0; i<nBackground_gen; i++)
    {
       mass->setVal(genData_bkg_mass->get(i)->getRealValue("mass"));
@@ -165,8 +144,8 @@ void Class2::extractSignal()
 {
    MakeSpinSPlot splotter(toyData);
    splotter.addSpecies("signal",ws->pdf("model_sig_mass"),signalYield);
-splotter.addSpecies("background",ws->pdf("model_bkg_mass"),backgroundYield);
-   splotter.addVariable(mass);
+   splotter.addSpecies("background",ws->pdf("model_bkg_mass"),backgroundYield);
+   splotter.addVariable(ws->var("mass"));
    splotter.calculate();
    RooDataSet *sweights = splotter.getSWeightDataSet();
    sweights->SetName("sweights");
@@ -195,25 +174,23 @@ splotter.addSpecies("background",ws->pdf("model_bkg_mass"),backgroundYield);
 
 void Class2::plot(TString plot_dir = "./plots")
 {
-   RooAbsPdf *modelCos0 = ws->pdf("model_sig0_cosT");
-
-   ws->Print();
-
-   RooPlot* frame = cosT->frame();
-   modelCos0->plotOn(frame);
-   TCanvas c;
-   frame->Draw();
-   c.SaveAs("cos0pdf.pdf");
-
-
-
    RooPlot* frame1 = cosT->frame();
-   extractedData->reduce("cosT")->plotOn(frame1);
-   extractedData->statOn(frame1,Layout(0.55,0.99,0.8));
-   modelCos0->plotOn(frame1);
+   RooAbsData *data = extractedData->reduce("cosT");
+   data->statOn(frame1,Layout(0.55,0.99,0.8));
+   RooAbsPdf *model_sig0_cosT = ws->pdf("model_sig1_cosT");
+
+   RooDataHist hist3("hist3","",*cosT,*data);
+   hist3.plotOn(frame1);
+   model_sig0_cosT->plotOn(frame1);
    TCanvas c1;
    frame1->Draw();
    c1.SaveAs(plot_dir+"/extracted_sig_cosT.pdf");
+
+   double chi2 = frame1->chiSquare(1);
+   cout<<"chi-squared is "<<chi2<<endl;
+
+
+
 
    RooPlot* frame2 = mass->frame();
    extractedData->reduce("mass")->plotOn(frame2);
