@@ -1,12 +1,17 @@
-This code runs over H->gamgam Monte Carlo and produces
-histograms in the file histos14.root.
+Author: Jeff Picard
+August 2013
 
+H->gamma gamma spin analysis code
+This program analyzes our expected sensitivity to the Higgs
+spin measurement.
+
+
+(must be run from t3-higgs if configured to run over MC)
 To run the code:
 make
-./runSpin
+./run
 
 
 Options:
-There are no arguments. In the file mainSpin.cc you can 
-change whether to run over the 8TeV or 14TeV MC and whether
-to run over all files or just one.
+There are no arguments. Edit config.cfg to specify various
+options described there.

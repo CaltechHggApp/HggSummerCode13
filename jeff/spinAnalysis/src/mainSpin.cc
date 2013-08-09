@@ -34,14 +34,13 @@ int main()
    ReadConfig cfgReader("config.cfg");
    int runMC = atoi(cfgReader.getParameter("runMC").c_str());
    int allMC = atoi(cfgReader.getParameter("allMC").c_str());
-   int EB_res = atoi(cfgReader.getParameter("EB_res").c_str());
-   int EE_res = atoi(cfgReader.getParameter("EE_res").c_str());
+//   int EB_res = atoi(cfgReader.getParameter("EB_res").c_str());
+//   int EE_res = atoi(cfgReader.getParameter("EE_res").c_str());
    float maxEta = atof(cfgReader.getParameter("maxEta").c_str());
    float lumi = atof(cfgReader.getParameter("lumi").c_str());
    int nBins = atoi(cfgReader.getParameter("nBins").c_str());
 
-   int energy = atoi(cfgReader.getParameter("energy").c_str());
-   int n_bkg = atoi(cfgReader.getParameter("n_bkg").c_str());
+//   int energy = atoi(cfgReader.getParameter("energy").c_str());
    TString plot_dir = cfgReader.getParameter("plot_dir").c_str();
 
 
@@ -61,13 +60,12 @@ int main()
 
    Class2 obj;
    obj.setNBins(nBins);
-   obj.setNSignal(lumi, n_bkg);
-   obj.create_signal_pdfs();
-   obj.create_spin2_pdf();
-   obj.generate();
-   obj.determineYield();
-   obj.extractSignal();
-   obj.plot(plot_dir);
-
+   obj.setNSignal(lumi);
+   obj.apply_cuts(maxEta);
+   obj.create_pdfs();
+   obj.generate_toy();
+   obj.calculate_yield();
+   obj.extract_signal();
+   obj.getPvalue();
    return 0;
 }

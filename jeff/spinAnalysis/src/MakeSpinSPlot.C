@@ -125,8 +125,19 @@ void MakeSpinSPlot::computeSWeight(){
     }//end loop over species
 //    cout<<"mass is "<<__variables[0]->getVal()<<"     pdf is "<<__pdfs[0]->getVal(__observables)<<endl;
     __sWeightDataSet->add(*__sWeightVars);
-//    cout<<"mass is "<<__variables[0]->getVal()<<" sig sweight is "<<__sWeightDataSet->get(iEntry)->getRealValue("signal_sw")<<endl;
+//    cout<<"mass is "<<__variables[0]->getVal()<<" sig sw is "<<__sWeightDataSet->get(iEntry)->getRealValue("signal_sw")<<" bkg sw is "<<__sWeightDataSet->get(iEntry)->getRealValue("background_sw")<<endl;
   }  //end while loop
+
+
+   cout<<"number of variables is "<<__variables.size()<<endl;
+   cout<<"number of species is "<<__pdfs.size()<<endl;
+   RooPlot* frame1 = __variables[0]->frame();
+   __pdfs[1]->plotOn(frame1);
+   TCanvas c1;
+   frame1->Draw();
+//   c1.SaveAs("sigPdf.pdf");
+   __variables[0]->setVal(125);
+   cout<<"pdf at mgg=125 is "<<__pdfs[1]->getVal(*__variables[0])<<endl; 
 
 }
 
