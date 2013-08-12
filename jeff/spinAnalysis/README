@@ -2,16 +2,17 @@ Author: Jeff Picard
 August 2013
 
 H->gamma gamma spin analysis code
-This program analyzes our expected sensitivity to the Higgs
+This program analyzes the expected sensitivity to the Higgs
 spin measurement.
 
 
-(must be run from t3-higgs if configured to run over MC)
 To run the code:
 make
-./run
+./runMC            (must be run from t3-higgs)
+./makePlots        (plots are saved in ./plots by default)
 
 
 Options:
 There are no arguments. Edit config.cfg to specify various
 options described there.
+

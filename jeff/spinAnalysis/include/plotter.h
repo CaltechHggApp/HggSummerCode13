@@ -35,6 +35,7 @@
 #include "TError.h"
 #include <numeric>
 #include <vector>
+#include "TGraphErrors.h"
 
 using namespace std;
 using namespace RooFit;

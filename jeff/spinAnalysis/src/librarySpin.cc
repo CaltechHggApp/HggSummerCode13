@@ -53,7 +53,7 @@ TTree* makeTree(int spin, int all)
 {
    int energy_0 = 14;
    int energy_2 = 8;
-   int local = 1;
+   int local = 0;
 
    TChain *chain = new TChain();
    if(spin == 0 && energy_0 ==8)
@@ -61,7 +61,6 @@ TTree* makeTree(int spin, int all)
       chain->SetName("ntp1");
 
       TString directory = "/mnt/tier2/store/user/amott/Vecbos2012/MC/V00-5_3_X/GluGluToHToGG_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/";
-      if(local) directory = "~/Documents/MC/";
 
       chain->Add(directory + "default_MC_10_1_nt4.root");
       if (all)

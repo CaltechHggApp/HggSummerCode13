@@ -100,13 +100,16 @@ void plotter::readMC()
 
 void plotter::calculate()
 {
-   int nToys = 3;
+   int nToys = 20;
    Class2 thing;
    thing.setPdfs(ws);
    thing.setNBins(nBins);
-   lumi.push_back(10);
-   lumi.push_back(20);
-   lumi.push_back(0);
+   lumi.push_back(1);
+   lumi.push_back(2);
+   lumi.push_back(3);
+//   lumi.push_back(4);
+   lumi.push_back(5);
+//   lumi.push_back(10);
 
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
@@ -126,6 +129,12 @@ void plotter::calculate()
       pvalueMean.push_back(meanPval);
       pvalueSigma.push_back(stdev);
    }
+   cout<<endl;
+   for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
+   {
+      int index = lumiIt - lumi.begin();
+      cout<<"lumi is "<<lumi[index]<<"  ; pval mean is "<<pvalueMean[index]<<"  ; pval std is "<<pvalueSigma[index]<<endl;
+   }
 }
 
 void plotter::make_plot_of_toy()
@@ -140,6 +149,32 @@ void plotter::make_plot_of_toy()
    thing.plot(plot_dir);
    thing.getPvalue();
 
+}
+
+void plotter::make_plot_lumi()
+{
+   int n = lumi.size();
+   double x[n];
+   double y[n];
+   double dx[n];
+   double dy[n];
+
+   for(int i=0; i<n; i++)
+   {
+      x[i] = lumi[i];
+      y[i] = pvalueMean[i];
+      dy[i] = pvalueSigma[i];
+      dx[i] = 0.;
+   }
+
+   TCanvas c1;
+   TGraphErrors graph(n,x,y,dx,dy);
+   graph.SetMarkerStyle(20);
+   graph.SetMarkerSize(1.0);
+   graph.GetXaxis()->SetTitle("lumi");
+   graph.GetYaxis()->SetTitle("expected pvalue");
+   graph.Draw("AP");
+   c1.SaveAs("./plots/pval_vs_lumi.pdf");
 }
 
 

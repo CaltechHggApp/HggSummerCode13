@@ -31,7 +31,8 @@ int main()
 
    walter.makePdfs();
    walter.make_plot_of_toy();
-
+   walter.calculate();
+   walter.make_plot_lumi();
 
    // Make plots for many toys
 
