@@ -1,33 +1,9 @@
-#include <TROOT.h>
-#include <TTree.h>
-#include <TChain.h>
-#include <TLorentzVector.h>
-#include <TClonesArray.h>
-
-
-#include <iostream>
-#include <stdio.h>
-#include <algorithm>
-#include <math.h>
-#include <fstream>
-
-// ROOT includes                                                                            
-#include <TROOT.h>
-#include <TFile.h>
-#include <TString.h>
-#include <TTree.h>
-#include <TChain.h>
-#include <TH1F.h>
-#include <TVector3.h>
-#include <TLorentzVector.h>
-#include <TRandom3.h>
-#include <TF1.h>
-
+#include "librarySpin.h"
 
 using namespace std;
 
 
-float smear(float energy, float eta)
+float smear(float energy, float eta, float EB_res, float EE_res)
 {
    TRandom3 random(0);
    if(fabs(eta) < 1.4)
@@ -77,12 +53,15 @@ TTree* makeTree(int spin, int all)
 {
    int energy_0 = 14;
    int energy_2 = 8;
+   int local = 0;
+
    TChain *chain = new TChain();
    if(spin == 0 && energy_0 ==8)
    {
       chain->SetName("ntp1");
 
       TString directory = "/mnt/tier2/store/user/amott/Vecbos2012/MC/V00-5_3_X/GluGluToHToGG_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/";
+
       chain->Add(directory + "default_MC_10_1_nt4.root");
       if (all)
       {
@@ -115,7 +94,9 @@ TTree* makeTree(int spin, int all)
       chain->SetName("Events");
 
       TString directory = "/mnt/tier2/store/user/amott/LiteFormat2013/MC/V03-6_1_2_SLHC4_patch2/GluGluToHToGG_M-125_14TeV-powheg-pythia6/Summer12-PU50_POSTLS161_V12-v1//";
-      chain->Add(directory + "BACONNtuple_10_1_lLB.root");
+      if(local) chain->Add("~/Documents/MC/BACONNtuple_26_1_JKG.root");
+
+      if(!local) chain->Add(directory + "BACONNtuple_10_1_lLB.root");
       if(all)
       {
          chain->Add(directory + "BACONNtuple_11_2_VzI.root");
@@ -154,9 +135,9 @@ TTree* makeTree(int spin, int all)
       chain->SetName("ntp1");
 
       TString directory = "/mnt/tier2/store/user/apresyan/Vecbos2012/MC/V06-5_3_X/Graviton2PMGluGluToHToGG_M-125_8TeV-jhu-pythia6/Summer12_DR53X-PU_S10_START53_V7C-v1/";
-//      TString directory = "~/";
+      if(local) chain->Add("~/Documents/MC/default_MC_27_1_fzS.root");
 
-      chain->Add(directory + "default_MC_10_1_ZiX.root");
+      if(!local) chain->Add(directory + "default_MC_10_1_ZiX.root");
       if (all)
       {
          chain->Add(directory + "default_MC_11_1_0fA.root");

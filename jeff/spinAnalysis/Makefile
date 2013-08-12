@@ -6,10 +6,9 @@ ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs) -lTMVA -lMLP -lXMLIO
 ROOFITLIBS    = -L$(ROOFITSYS)/lib -lRooFitCore -lRooFit -lRooStats -lMinuit -lFoam
 
 CXX           = g++ -m64
-#CXXFLAGS      = -g -fPIC -Wno-deprecated -O -ansi -D_GNU_SOURCE -g -O2 -Xlinker -zmuldefs -Wall -Wno-error=unused-variable -Wno-error=sign-compare -Wno-error=unused-value -Wno-error=unused-but-set-variable -fopenmp -std=gnu++0x
 
-
-CXXFLAGS      = 
+#CXXFLAGS      = -Wall
+CXXFLAGS      =  
 
 CXXFLAGS      += $(ROOTCFLAGS)
 CXXFLAGS      += $(FASTJETFLAGS)
@@ -23,10 +22,45 @@ INCLUDEDIR       = ./include/
 INCLUDEDIRCOMMON = ./
 INCLUDEDIRROOFIT = $(ROOFITSYS)/include/
 
+HGGAPPINC        = ./include/
+SRCDIR           = ./src/
+EXESRCDIR        = ./exesrc/
 CXX	         += -I$(INCLUDEDIR) -I$(INCLUDEDIRCOMMON) -I. -I$(INCLUDEDIRROOFIT)
+OUTLIB   	= ./lib/
+
+all: runMC makePlots
 
 
-run: src/mainSpin.cc src/MakeSpinSPlot.C src/class2.cc config.cfg src/analyzerSpin.cc
-	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -o run  $(GLIBS) $ $<	
+runMC:          $(EXESRCDIR)runMC.cc \
+                $(OUTLIB)analyzerSpin.o \
+		$(HGGAPPINC)ReadConfig.hh \
+		$(OUTLIB)librarySpin.o
+	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o runMC $(OUTLIB)/*.o $(GLIBS) $<
 
+
+makePlots:	$(EXESRCDIR)makePlots.cc \
+		$(OUTLIB)class2.o \
+		$(OUTLIB)plotter.o \
+		$(HGGAPPINC)ReadConfig.hh \
+		$(OUTLIB)MakeSpinSPlot.o
+	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o makePlots $(OUTLIB)/*.o $(GLIBS) $<
+
+
+$(OUTLIB)analyzerSpin.o:	$(SRCDIR)analyzerSpin.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)analyzerSpin.o $<
+
+
+$(OUTLIB)librarySpin.o: $(SRCDIR)librarySpin.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)librarySpin.o $<
+
+
+$(OUTLIB)class2.o: $(SRCDIR)class2.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)class2.o $<
+
+$(OUTLIB)plotter.o: $(SRCDIR)plotter.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)plotter.o $<
+
+
+$(OUTLIB)MakeSpinSPlot.o: $(SRCDIR)MakeSpinSPlot.C
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeSpinSPlot.o $<
 

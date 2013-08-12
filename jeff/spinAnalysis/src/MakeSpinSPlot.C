@@ -1,4 +1,4 @@
-#include "../include/MakeSpinSPlot.h"
+#include "MakeSpinSPlot.h"
 #include <iostream>
 
 using namespace std;
@@ -29,7 +29,7 @@ void MakeSpinSPlot::computeCovMatrix(){
   __covMatrix = new TMatrixD(__nSpec,__nSpec);
 
   std::cout << "Entries: "<< __dataSet->sumEntries() <<std::endl;
-  std::cout << "Covariance Matrix:" << std::endl;
+  std::cout << "Covariance Matrix ^-1:" << std::endl;
   Long64_t iEntry=-1;
   const RooArgSet *set;
   //loop over dataset
@@ -62,13 +62,14 @@ void MakeSpinSPlot::computeCovMatrix(){
     }
     __covMatrix->Invert();
 
-    cout<<"\n after inverting"<<endl;
+    cout<<"\nCovariance matrix"<<endl;
     for(int iRow = 0; iRow<__nSpec;iRow++){
        for(int iCol = 0; iCol<__nSpec;iCol++){
 	  std::cout << (*__covMatrix)[iRow][iCol] << " ";
        }
-       std::cout << std::endl;
+       std::cout<< std::endl;
     }
+    std::cout<<endl;
 
 }
 
@@ -124,8 +125,17 @@ void MakeSpinSPlot::computeSWeight(){
     }//end loop over species
 //    cout<<"mass is "<<__variables[0]->getVal()<<"     pdf is "<<__pdfs[0]->getVal(__observables)<<endl;
     __sWeightDataSet->add(*__sWeightVars);
-//    cout<<"mass is "<<__variables[0]->getVal()<<" sig sweight is "<<__sWeightDataSet->get(iEntry)->getRealValue("signal_sw")<<endl;
+//    cout<<"mass is "<<__variables[0]->getVal()<<" sig sw is "<<__sWeightDataSet->get(iEntry)->getRealValue("signal_sw")<<" bkg sw is "<<__sWeightDataSet->get(iEntry)->getRealValue("background_sw")<<endl;
   }  //end while loop
+
+
+//   RooPlot* frame1 = __variables[0]->frame();
+//   __pdfs[1]->plotOn(frame1);
+//   TCanvas c1;
+//   frame1->Draw();
+//   c1.SaveAs("sigPdf.pdf");
+//   __variables[0]->setVal(125);
+//   cout<<"pdf at mgg=125 is "<<__pdfs[1]->getVal(*__variables[0])<<endl; 
 
 }
 
