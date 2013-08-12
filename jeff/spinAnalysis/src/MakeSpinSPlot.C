@@ -1,4 +1,4 @@
-#include "../include/MakeSpinSPlot.h"
+#include "MakeSpinSPlot.h"
 #include <iostream>
 
 using namespace std;
@@ -129,15 +129,13 @@ void MakeSpinSPlot::computeSWeight(){
   }  //end while loop
 
 
-   cout<<"number of variables is "<<__variables.size()<<endl;
-   cout<<"number of species is "<<__pdfs.size()<<endl;
-   RooPlot* frame1 = __variables[0]->frame();
-   __pdfs[1]->plotOn(frame1);
-   TCanvas c1;
-   frame1->Draw();
+//   RooPlot* frame1 = __variables[0]->frame();
+//   __pdfs[1]->plotOn(frame1);
+//   TCanvas c1;
+//   frame1->Draw();
 //   c1.SaveAs("sigPdf.pdf");
-   __variables[0]->setVal(125);
-   cout<<"pdf at mgg=125 is "<<__pdfs[1]->getVal(*__variables[0])<<endl; 
+//   __variables[0]->setVal(125);
+//   cout<<"pdf at mgg=125 is "<<__pdfs[1]->getVal(*__variables[0])<<endl; 
 
 }
 

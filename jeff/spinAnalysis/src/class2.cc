@@ -1,92 +1,12 @@
-#include "../include/class2.h"
-#include "MakeSpinSPlot.C"
+#include "class2.h"
+#include "MakeSpinSPlot.h"
 
 
-void Class2::setNSignal(float lumi)
+void Class2::setNSignal(double nsig)
 {
-   double crossSection = 49.85e-12;
-   double BR = 2.28e-3;
-   nSignal_gen = lumi * 1.0e15 * crossSection * BR;
+   nSignal_gen = round(nsig);
    nBackground_gen = round(10 * nSignal_gen);
-   cout<<"-number of signal at this lumi: "<<nSignal_gen<<endl;
-}
-
-
-void Class2::apply_cuts(float etaCut)
-{
-   RooRealVar pt1("pt1","",0,500);
-   RooRealVar pt2("pt2","",0,500);
-   RooRealVar maxEta("maxEta","",0,50);
-   const RooArgSet *event;
-   int nEntries;
-
-   // spin 0
-   TFile *f = new TFile("./lib/MC_output_0.root");
-   TTree *tree = (TTree*)f->Get("tree");
-
-   RooDataSet MC0("MC0","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*tree));
-   spin0Signal = new RooDataSet("spin0Signal","",RooArgSet(*mass,*cosT));
-
-   nEntries=MC0.numEntries();
-   for(int i=0; i<nEntries; i++)
-   {
-      event = MC0.get(i);
-      if(event->getRealValue("pt1")<24) continue;
-      if(event->getRealValue("pt2")<16) continue;
-      double max_eta = event->getRealValue("maxEta");
-      if (max_eta>etaCut) continue;
-
-      mass->setVal(event->getRealValue("mass"));
-      cosT->setVal(event->getRealValue("cosT"));
-      spin0Signal->add(RooArgSet(*mass,*cosT));
-   }
-   signalEfficiency = (float)spin0Signal->numEntries() / (float)nEntries;
-
-   // spin 2
-   f = new TFile("./lib/MC_output_2.root");
-   tree = (TTree*)f->Get("tree");
-
-   RooDataSet MC2("MC2","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*tree));
-   spin2Signal = new RooDataSet("spin2Signal","",RooArgSet(*mass,*cosT));
-
-   nEntries=MC2.numEntries();
-   for(int i=0; i<nEntries; i++)
-   {
-      event = MC2.get(i);
-      if(event->getRealValue("pt1")<24) continue;
-      if(event->getRealValue("pt2")<16) continue;
-      double max_eta = event->getRealValue("maxEta");
-      if (max_eta>etaCut) continue;
-
-      mass->setVal(event->getRealValue("mass"));
-      cosT->setVal(event->getRealValue("cosT"));
-      spin2Signal->add(RooArgSet(*mass,*cosT));
-   }
-}
-
-void Class2::create_pdfs()
-{
-   // signal pdf's
-   RooGaussian model_sig_mass("model_sig_mass","",*mass,*mean_sig_mass,*sigma_sig_mass);
-   model_sig_mass.fitTo(*(spin0Signal->reduce("mass")),PrintLevel(-1));
-   signalWidth = sigma_sig_mass->getVal();
-
-   RooDataHist hist0("hist0","",*cosT, *(spin0Signal->reduce("cosT")));
-   RooHistPdf model_sig0_cosT("model_sig0_cosT","",*cosT,hist0);
-
-   RooDataHist hist2("hist2","",*cosT, *(spin2Signal->reduce("cosT")));
-   RooHistPdf model_sig2_cosT("model_sig2_cosT","",*cosT,hist2);
-
-
-   // background pdf's
-   RooExponential model_bkg_mass("model_bkg_mass","",*mass,*c_bkg_mass);
-   RooPolynomial model_bkg_cosT("model_bkg_cosT","",*cosT,RooArgList(*p1_bkg_cosT,*p2_bkg_cosT));
-
-   ws->import(model_sig_mass);
-   ws->import(model_sig0_cosT);
-   ws->import(model_sig2_cosT);
-   ws->import(model_bkg_mass);
-   ws->import(model_bkg_cosT);
+   cout<<"-number of signal at this lumi after acceptance cuts: "<<nSignal_gen<<endl;
 }
 
 
@@ -98,17 +18,14 @@ void Class2::generate_toy()
 
    toyData = new RooDataSet("toyData","",event);
 
-   int create_n = (int)round(nSignal_gen * signalEfficiency);
-   cout<<"-signal acceptance x efficiency is "<<signalEfficiency<<endl;
    RooDataSet *genData_sig_mass;
    RooDataSet *genData_sig_cosT;
 
-   sigma_sig_mass->setVal(signalWidth);
-   genData_sig_mass = ws->pdf("model_sig_mass")->generate(*mass,create_n);
-   genData_sig_cosT = ws->pdf("model_sig0_cosT")->generate(*cosT,create_n,AutoBinned(false));
+   genData_sig_mass = ws->pdf("model_sig_mass")->generate(*mass,nSignal_gen);
+   genData_sig_cosT = ws->pdf("model_sig0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false));
 
-   cout<<"-generating "<<create_n<<" signal events"<<endl;
-   for(int i=0; i<create_n; i++)
+   cout<<"-generating "<<nSignal_gen<<" signal events"<<endl;
+   for(int i=0; i<nSignal_gen; i++)
    {
       mass->setVal(genData_sig_mass->get(i)->getRealValue("mass"));
       cosT->setVal(genData_sig_cosT->get(i)->getRealValue("cosT"));
@@ -143,6 +60,7 @@ void Class2::calculate_yield()
 
 void Class2::extract_signal()
 {
+   calculate_yield();
    MakeSpinSPlot splotter(toyData);
    splotter.addSpecies("signal",ws->pdf("model_sig_mass"),signalYield);
    splotter.addSpecies("background",ws->pdf("model_bkg_mass"),backgroundYield);
@@ -175,10 +93,11 @@ void Class2::extract_signal()
 
 void Class2::plot(TString plot_dir)
 {
-
    RooPlot* frame1 = cosT->frame();
    extractedData->reduce("cosT")->plotOn(frame1);
    extractedData->statOn(frame1,Layout(0.55,0.99,0.8));
+   RooAbsPdf *model_sig2_cosT = ws->pdf("model_sig2_cosT");
+   model_sig2_cosT->plotOn(frame1);
    TCanvas c1;
    frame1->Draw();
    c1.SaveAs(plot_dir+"/extracted_sig_cosT.pdf");
@@ -222,4 +141,23 @@ double Class2::getPvalue()
    cout<<"-dof is "<<dof<<endl;
    cout<<"-pvalue is "<< pvalue<<endl;
    return pvalue;
+}
+
+
+Class2::Class2()
+{
+   ws = new RooWorkspace("ws","");
+   mass = new RooRealVar("mass","",110,150);
+   cosT = new RooRealVar("cosT","",0.,1.);
+}
+
+
+Class2::~Class2()
+{
+   delete mass;
+   delete cosT;
+   delete toyData;
+//   delete extractedData;
+//   delete ws;
+
 }

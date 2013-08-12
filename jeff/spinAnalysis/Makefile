@@ -22,10 +22,45 @@ INCLUDEDIR       = ./include/
 INCLUDEDIRCOMMON = ./
 INCLUDEDIRROOFIT = $(ROOFITSYS)/include/
 
+HGGAPPINC        = ./include/
+SRCDIR           = ./src/
+EXESRCDIR        = ./exesrc/
 CXX	         += -I$(INCLUDEDIR) -I$(INCLUDEDIRCOMMON) -I. -I$(INCLUDEDIRROOFIT)
+OUTLIB   	= ./lib/
+
+all: runMC makePlots
 
 
-run: src/mainSpin.cc src/* include/* config.cfg 
-	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -o run  $(GLIBS) src/mainSpin.cc	
+runMC:          $(EXESRCDIR)runMC.cc \
+                $(OUTLIB)analyzerSpin.o \
+		$(HGGAPPINC)ReadConfig.hh \
+		$(OUTLIB)librarySpin.o
+	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o runMC $(OUTLIB)/*.o $(GLIBS) $<
 
+
+makePlots:	$(EXESRCDIR)makePlots.cc \
+		$(OUTLIB)class2.o \
+		$(OUTLIB)plotter.o \
+		$(HGGAPPINC)ReadConfig.hh \
+		$(OUTLIB)MakeSpinSPlot.o
+	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o makePlots $(OUTLIB)/*.o $(GLIBS) $<
+
+
+$(OUTLIB)analyzerSpin.o:	$(SRCDIR)analyzerSpin.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)analyzerSpin.o $<
+
+
+$(OUTLIB)librarySpin.o: $(SRCDIR)librarySpin.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)librarySpin.o $<
+
+
+$(OUTLIB)class2.o: $(SRCDIR)class2.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)class2.o $<
+
+$(OUTLIB)plotter.o: $(SRCDIR)plotter.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)plotter.o $<
+
+
+$(OUTLIB)MakeSpinSPlot.o: $(SRCDIR)MakeSpinSPlot.C
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeSpinSPlot.o $<
 
