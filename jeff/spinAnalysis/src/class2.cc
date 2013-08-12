@@ -6,7 +6,7 @@ void Class2::setNSignal(double nsig)
 {
    nSignal_gen = round(nsig);
    nBackground_gen = round(10 * nSignal_gen);
-   cout<<"-number of signal at this lumi after acceptance cuts: "<<nSignal_gen<<endl;
+//   cout<<"-number of signal at this lumi after acceptance cuts: "<<nSignal_gen<<endl;
 }
 
 
@@ -23,7 +23,6 @@ void Class2::generate_toy()
 
    genData_sig_mass = ws->pdf("model_sig_mass")->generate(*mass,nSignal_gen);
    genData_sig_cosT = ws->pdf("model_sig0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false));
-
    cout<<"-generating "<<nSignal_gen<<" signal events"<<endl;
    for(int i=0; i<nSignal_gen; i++)
    {
@@ -54,8 +53,8 @@ void Class2::calculate_yield()
    signalYield = round(tempSigYield.getVal());
    backgroundYield = round(tempBkgYield.getVal());
 
-   cout<<"\n-signal yield is "<<signalYield<<endl;
-   cout<<"-background yield is    "<<backgroundYield<<"\n"<<endl;
+   cout<<"-signal yield is "<<signalYield<<endl;
+   cout<<"-background yield is "<<backgroundYield<<endl;
 }
 
 void Class2::extract_signal()
@@ -102,12 +101,14 @@ void Class2::plot(TString plot_dir)
    frame1->Draw();
    c1.SaveAs(plot_dir+"/extracted_sig_cosT.pdf");
 
+/*
    RooPlot* frame2 = mass->frame();
    extractedData->reduce("mass")->plotOn(frame2);
    extractedData->statOn(frame2,Layout(0.55,0.99,0.8));
    TCanvas c2;
    frame2->Draw();
    c2.SaveAs(plot_dir+"/extracted_sig_mass.pdf");
+*/
 
    RooPlot* frame3 = cosT->frame();
    toyData->reduce("cosT")->plotOn(frame3);
@@ -135,10 +136,10 @@ double Class2::getPvalue()
    model_sig2_cosT->plotOn(frame1);
 
    double chi2 = frame1->chiSquare();
-   cout<<"\n-chi-squared is "<<chi2<<endl;
+   cout<<"-chi squared is "<<chi2<<endl;
    int dof = cosT->getBins();
    double pvalue = TMath::Prob(chi2,dof-1);
-   cout<<"-dof is "<<dof<<endl;
+   cout<<"-dof - 1 is "<<dof-1<<endl;
    cout<<"-pvalue is "<< pvalue<<endl;
    return pvalue;
 }
@@ -146,7 +147,6 @@ double Class2::getPvalue()
 
 Class2::Class2()
 {
-   ws = new RooWorkspace("ws","");
    mass = new RooRealVar("mass","",110,150);
    cosT = new RooRealVar("cosT","",0.,1.);
 }
@@ -157,7 +157,5 @@ Class2::~Class2()
    delete mass;
    delete cosT;
    delete toyData;
-//   delete extractedData;
-//   delete ws;
-
+   delete extractedData;
 }

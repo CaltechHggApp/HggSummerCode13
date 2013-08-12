@@ -30,6 +30,12 @@ OUTLIB   	= ./lib/
 
 all: runMC makePlots
 
+clean:
+	rm -f $(OUTLIB)*.o
+	rm -f runMC
+	rm -f makePlots
+
+
 
 runMC:          $(EXESRCDIR)runMC.cc \
                 $(OUTLIB)analyzerSpin.o \

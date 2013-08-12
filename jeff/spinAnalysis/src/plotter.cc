@@ -15,6 +15,8 @@ plotter::plotter()
 plotter::~plotter()
 {
    delete ws;
+   delete mass;
+   delete cosT;
 }
 
 
@@ -57,6 +59,8 @@ void plotter::makePdfs()
    ws->import(model_sig2_cosT);
    ws->import(model_bkg_mass);
    ws->import(model_bkg_cosT);
+   delete MC0;
+   delete MC2;
 }
 
 
@@ -96,27 +100,23 @@ void plotter::readMC()
 
    TFile file2("./lib/2_" + MC_filename);
    MC2 = new RooDataSet("MC2","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file2.Get("tree"))));
+   file0.Close();
+   file2.Close();
 }
 
 void plotter::calculate()
 {
-   int nToys = 20;
    Class2 thing;
    thing.setPdfs(ws);
    thing.setNBins(nBins);
-   lumi.push_back(1);
-   lumi.push_back(2);
-   lumi.push_back(3);
-//   lumi.push_back(4);
-   lumi.push_back(5);
-//   lumi.push_back(10);
-
+   cout<<"rawrrrrr "<<ws<<endl;
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       thing.setNSignal(lumi_to_nsignal(*lumiIt));
       vector<double> pvals;
       for(int i=0; i<nToys; i++)
       {
+	 cout<<"\nmaking new toy"<<endl;
 	 thing.generate_toy();
 	 thing.extract_signal();
 	 pvals.push_back(thing.getPvalue());
@@ -133,16 +133,16 @@ void plotter::calculate()
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       int index = lumiIt - lumi.begin();
-      cout<<"lumi is "<<lumi[index]<<"  ; pval mean is "<<pvalueMean[index]<<"  ; pval std is "<<pvalueSigma[index]<<endl;
+      cout<<"lumi is "<<lumi[index]<<";  pval mean is "<<pvalueMean[index]<<";  pval std is "<<pvalueSigma[index]<<endl;
    }
 }
 
 void plotter::make_plot_of_toy()
 {
+   cout<<"\nMAKING PLOT OF SINGLE TOY"<<endl;
    Class2 thing;
    thing.setNSignal(lumi_to_nsignal(plotLumi));
    thing.setPdfs(ws);
-   cout<<"setting number of bins to "<<nBins<<endl;
    thing.setNBins(nBins);
    thing.generate_toy();
    thing.extract_signal();
@@ -153,6 +153,7 @@ void plotter::make_plot_of_toy()
 
 void plotter::make_plot_lumi()
 {
+   cout<<"\nMAKING PVALUE VS LUMI PLOT"<<endl;
    int n = lumi.size();
    double x[n];
    double y[n];

@@ -48,12 +48,20 @@ public:
    TString plot_dir;
    double plotLumi;
    int nBins;
+   int nToys;
+
 
    RooWorkspace *ws;
    double acceptance_x_efficiency;
 
    RooRealVar *mass;
    RooRealVar *cosT;
+
+   RooDataSet *MC0;
+   RooDataSet *MC2;
+   vector<double> lumi;
+   vector<double> pvalueMean;
+   vector<double> pvalueSigma;
 
    plotter();
    ~plotter();
@@ -62,20 +70,13 @@ public:
    void setNBins(int nbins){nBins = nbins;}
    void setLumi(double luminosity) {plotLumi = luminosity;}
    void setPlotDirectory(TString dir) {plot_dir = dir;}
+   void setNToys(int n) {nToys = n;}
+   void setLumis(vector<double> numbers) {lumi = numbers;}
    void makePdfs();
    void make_plot_of_toy();
    void calculate();
    void make_plot_lumi();
    void make_plot_sigma();
-
-
-
-   RooDataSet *MC0;
-   RooDataSet *MC2;
-   vector<double> lumi;
-   vector<double> pvalueMean;
-   vector<double> pvalueSigma;
-
    void readMC();
    RooDataSet* applyCuts(RooDataSet *originalData);
    double lumi_to_nsignal(double lumi);

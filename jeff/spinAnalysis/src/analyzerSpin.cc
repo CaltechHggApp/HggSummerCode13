@@ -100,18 +100,18 @@ void HggSpin::setResolution(float barrel, float endcap)
 
 void HggSpin::Loop(TString filename)
 {
-   TFile *outputFile = new TFile(filename, "recreate");
-   TTree *tree = new TTree("tree","");
+   TFile outputFile(filename, "recreate");
+   TTree tree("tree","");
    Float_t mass;
    Float_t cosT;
    Float_t maxEta;
    Float_t pt1;
    Float_t pt2;
-   tree->Branch("mass",&mass,"mass/F");
-   tree->Branch("cosT",&cosT,"cosT/F");
-   tree->Branch("maxEta",&maxEta,"maxEta/F");
-   tree->Branch("pt1",&pt1,"pt1/F");
-   tree->Branch("pt2",&pt2,"pt2/F");
+   tree.Branch("mass",&mass,"mass/F");
+   tree.Branch("cosT",&cosT,"cosT/F");
+   tree.Branch("maxEta",&maxEta,"maxEta/F");
+   tree.Branch("pt1",&pt1,"pt1/F");
+   tree.Branch("pt2",&pt2,"pt2/F");
    
    Long_t nEvents = chain->GetEntries();
    cout<<"number of MC events is "<<nEvents<<endl;
@@ -160,12 +160,12 @@ void HggSpin::Loop(TString filename)
       maxEta = max(fabs(gamma1.Eta()), fabs(gamma2.Eta()));
       pt1=gamma1.Pt();
       pt2=gamma2.Pt();
-      tree->Fill();
+      tree.Fill();
    } // end loop over events
 
-   outputFile->cd();
-   outputFile->Write();
-   outputFile->Close();
+   outputFile.cd();
+   outputFile.Write();
+   outputFile.Close();
 
    cout<<"finished processing MC "<< endl;
 }

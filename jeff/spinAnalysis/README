@@ -8,8 +8,8 @@ spin measurement.
 
 To run the code:
 make
-./runMC            (must be run from t3-higgs)
-./makePlots        (plots are saved in ./plots by default)
+./runMC            (must be run from t3-higgs) (~1-2 minutes)
+./makePlots        (plots are saved in ./plots by default) (~10 seconds)
 
 
 Options:

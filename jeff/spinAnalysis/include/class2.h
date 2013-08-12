@@ -43,29 +43,14 @@ using namespace RooFit;
 class Class2 {
 public:
    RooWorkspace *ws;
-
    RooRealVar *mass;
-//   RooRealVar *mean_sig_mass;
-//   RooRealVar *sigma_sig_mass;
-
    RooRealVar *cosT;
-
-//   RooRealVar *c_bkg_mass;
-
-//   RooRealVar *p1_bkg_cosT;
-//   RooRealVar *p2_bkg_cosT;
-
-//   float signalWidth;
-//   float signalEfficiency;
 
    float signalYield;
    float backgroundYield;
-   double nSignal_gen;
-   double nBackground_gen;
+   int nSignal_gen;
+   int nBackground_gen;
 
-
-//   RooDataSet *spin0Signal;
-//   RooDataSet *spin2Signal;
    RooDataSet *toyData;
    RooDataSet *extractedData;
 
