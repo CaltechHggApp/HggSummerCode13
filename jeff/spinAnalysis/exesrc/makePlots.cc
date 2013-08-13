@@ -19,19 +19,20 @@ int main()
    string luminosities = cfgReader.getParameter("luminosities");
    vector<string> luminositiesVec = cfgReader.tokenizeString(luminosities,",");
 
+
+   cout<<"maxEta is "<<maxEta<<endl;
+   cout<<"lumi is "<<lumi<<endl;
+   cout<<"nBins is "<<nBins<<endl;
+   cout<<"nToys is "<<nToys<<endl;
+
+
+
    vector<double> lumis;
-/*
    for(vector<string>::iterator it = luminositiesVec.begin(); it!=luminositiesVec.end(); it++)
    {
       double num = atof(it->c_str());
       lumis.push_back(num);
-      cout<< num * 2<<endl;
    }
-*/
-   lumis.push_back(1);
-   lumis.push_back(2);
-   lumis.push_back(3);
-   lumis.push_back(4);
 
    // Set seed
    (RooRandom::randomGenerator())->SetSeed(0);
@@ -50,11 +51,11 @@ int main()
 
    walter.makePdfs();
    walter.make_plot_of_toy();
-   walter.calculate();
-   walter.make_plot_lumi();
+
 
    // Make plots for many toys
-
+   walter.calculate();
+   walter.make_plot_lumi();
 
    return 0;
 }

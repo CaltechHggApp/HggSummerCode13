@@ -63,7 +63,7 @@ TTree* makeTree(int spin, int all)
       TString directory = "/mnt/tier2/store/user/amott/Vecbos2012/MC/V00-5_3_X/GluGluToHToGG_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/";
 
       chain->Add(directory + "default_MC_10_1_nt4.root");
-      if (all)
+      if (all && !local)
       {
          chain->Add(directory + "default_MC_11_1_UJo.root");
          chain->Add(directory + "default_MC_1_1_ZVS.root");
@@ -97,7 +97,7 @@ TTree* makeTree(int spin, int all)
       if(local) chain->Add("~/Documents/MC/BACONNtuple_26_1_JKG.root");
 
       if(!local) chain->Add(directory + "BACONNtuple_10_1_lLB.root");
-      if(all)
+      if(all && !local)
       {
          chain->Add(directory + "BACONNtuple_11_2_VzI.root");
          chain->Add(directory + "BACONNtuple_12_2_zbd.root");
@@ -138,7 +138,7 @@ TTree* makeTree(int spin, int all)
       if(local) chain->Add("~/Documents/MC/default_MC_27_1_fzS.root");
 
       if(!local) chain->Add(directory + "default_MC_10_1_ZiX.root");
-      if (all)
+      if (all && !local)
       {
          chain->Add(directory + "default_MC_11_1_0fA.root");
          chain->Add(directory + "default_MC_12_1_BpX.root");

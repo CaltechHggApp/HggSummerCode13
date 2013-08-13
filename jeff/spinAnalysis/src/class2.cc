@@ -5,43 +5,37 @@
 void Class2::setNSignal(double nsig)
 {
    nSignal_gen = round(nsig);
-   nBackground_gen = round(10 * nSignal_gen);
+   nBackground_gen = round(20 * nSignal_gen);
 //   cout<<"-number of signal at this lumi after acceptance cuts: "<<nSignal_gen<<endl;
 }
 
 
+void Class2::prepare_gen()
+{
+   genSpec_sig_mass = ws->pdf("model_sig_mass")->prepareMultiGen(*mass, NumEvents(nSignal_gen));
+//   genSpec_sig_cosT = ws->pdf("model_sig_cosT")->prepareMultiGen(*cosT,NumEvents(1000));
+   genSpec_bkg_mass = ws->pdf("model_bkg_mass")->prepareMultiGen(*mass, NumEvents(nBackground_gen));
+   genSpec_bkg_cosT = ws->pdf("model_bkg_cosT")->prepareMultiGen(*cosT, NumEvents(nBackground_gen));
+}
+
 void Class2::generate_toy()
 {
-   RooArgSet event;
-   event.add(*mass);
-   event.add(*cosT);
+   RooDataSet *toySignal;
+   toySignal = ws->pdf("model_sig_mass")->generate(*genSpec_sig_mass);
+   toySignal->merge(ws->pdf("model_sig0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false))); //autobinned
+//   cout<<"-generated "<<nSignal_gen<<" signal events"<<endl;
 
-   toyData = new RooDataSet("toyData","",event);
+   RooDataSet *toyBkg;
+   toyBkg= ws->pdf("model_bkg_mass")->generate(*genSpec_bkg_mass);
+   toyBkg->merge(ws->pdf("model_bkg_cosT")->generate(*genSpec_bkg_cosT));
+//   cout<<"-generated "<<nBackground_gen<<" background events"<<endl;
 
-   RooDataSet *genData_sig_mass;
-   RooDataSet *genData_sig_cosT;
+   toyData = new RooDataSet("toyData","",RooArgSet(*mass, *cosT));
+   toyData->append(*toySignal);
+   toyData->append(*toyBkg);
 
-   genData_sig_mass = ws->pdf("model_sig_mass")->generate(*mass,nSignal_gen);
-   genData_sig_cosT = ws->pdf("model_sig0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false));
-   cout<<"-generating "<<nSignal_gen<<" signal events"<<endl;
-   for(int i=0; i<nSignal_gen; i++)
-   {
-      mass->setVal(genData_sig_mass->get(i)->getRealValue("mass"));
-      cosT->setVal(genData_sig_cosT->get(i)->getRealValue("cosT"));
-      toyData->add(event);
-   }
-
-   RooDataSet *genData_bkg_mass = ws->pdf("model_bkg_mass")->generate(*mass,nBackground_gen);
-   RooDataSet *genData_bkg_cosT = ws->pdf("model_bkg_cosT")->generate(*cosT,nBackground_gen);
-
-   cout<<"-generating "<<nBackground_gen<<" background events"<<endl;
-   for(int i=0; i<nBackground_gen; i++)
-   {
-      mass->setVal(genData_bkg_mass->get(i)->getRealValue("mass"));
-      cosT->setVal(genData_bkg_cosT->get(i)->getRealValue("cosT"));
-      toyData->add(event);
-   }
-
+   delete toySignal;
+   delete toyBkg;
 }
 
 void Class2::calculate_yield()
@@ -53,8 +47,8 @@ void Class2::calculate_yield()
    signalYield = round(tempSigYield.getVal());
    backgroundYield = round(tempBkgYield.getVal());
 
-   cout<<"-signal yield is "<<signalYield<<endl;
-   cout<<"-background yield is "<<backgroundYield<<endl;
+//   cout<<"-signal yield is "<<signalYield<<endl;
+//   cout<<"-background yield is "<<backgroundYield<<endl;
 }
 
 void Class2::extract_signal()
@@ -135,20 +129,21 @@ double Class2::getPvalue()
    hist3.plotOn(frame1);
    model_sig2_cosT->plotOn(frame1);
 
-   double chi2 = frame1->chiSquare();
-   cout<<"-chi squared is "<<chi2<<endl;
-   int dof = cosT->getBins();
-   double pvalue = TMath::Prob(chi2,dof-1);
-   cout<<"-dof - 1 is "<<dof-1<<endl;
-   cout<<"-pvalue is "<< pvalue<<endl;
+   int dof = cosT->getBins() - 1;
+   double chi2 = frame1->chiSquare() * dof;
+//   cout<<"-chi squared is "<<chi2<<endl;
+   double pvalue = TMath::Prob(chi2,dof);
+//   cout<<"-dof is"<<dof<<endl;
+//   cout<<"-pvalue is "<< pvalue<<endl;
    return pvalue;
 }
 
 
 Class2::Class2()
 {
-   mass = new RooRealVar("mass","",110,150);
+   mass = new RooRealVar("mass","",110,140);
    cosT = new RooRealVar("cosT","",0.,1.);
+   mass->setBins(30);
 }
 
 

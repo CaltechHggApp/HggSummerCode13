@@ -8,8 +8,9 @@ using namespace RooFit;
 plotter::plotter()
 {
    ws = new RooWorkspace("ws");
-   mass = new RooRealVar("mass","diphoton mass",110,150);
+   mass = new RooRealVar("mass","diphoton mass",110,140);
    cosT = new RooRealVar("cosT","Collins - Soper angle",0,1);
+   mass->setBins(30);
 }
 
 plotter::~plotter()
@@ -45,6 +46,11 @@ void plotter::makePdfs()
 
    RooDataHist hist0("hist0","",*cosT, *(MC0->reduce("cosT")));
    RooHistPdf model_sig0_cosT("model_sig0_cosT","",*cosT,hist0);
+//   RooRealVar tempmean("tempmean","",.5,0,1);
+//   RooRealVar tempsig("tempsig","",.1,0,1);
+//   RooGaussian model_sig0_cosT("model_sig0_cosT","",*cosT,tempmean,tempsig);
+
+
 
    RooDataHist hist2("hist2","",*cosT, *(MC2->reduce("cosT")));
    RooHistPdf model_sig2_cosT("model_sig2_cosT","",*cosT,hist2);
@@ -109,14 +115,14 @@ void plotter::calculate()
    Class2 thing;
    thing.setPdfs(ws);
    thing.setNBins(nBins);
-   cout<<"rawrrrrr "<<ws<<endl;
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       thing.setNSignal(lumi_to_nsignal(*lumiIt));
       vector<double> pvals;
+      thing.prepare_gen();
       for(int i=0; i<nToys; i++)
       {
-	 cout<<"\nmaking new toy"<<endl;
+	 cout<<"making toy "<<i<<" at "<<*lumiIt<<"fb"<<endl;
 	 thing.generate_toy();
 	 thing.extract_signal();
 	 pvals.push_back(thing.getPvalue());
@@ -129,7 +135,7 @@ void plotter::calculate()
       pvalueMean.push_back(meanPval);
       pvalueSigma.push_back(stdev);
    }
-   cout<<endl;
+
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       int index = lumiIt - lumi.begin();
@@ -144,6 +150,7 @@ void plotter::make_plot_of_toy()
    thing.setNSignal(lumi_to_nsignal(plotLumi));
    thing.setPdfs(ws);
    thing.setNBins(nBins);
+   thing.prepare_gen();
    thing.generate_toy();
    thing.extract_signal();
    thing.plot(plot_dir);
@@ -169,12 +176,16 @@ void plotter::make_plot_lumi()
    }
 
    TCanvas c1;
+   c1.SetLogy();
    TGraphErrors graph(n,x,y,dx,dy);
+   graph.SetTitle("pval vs. lumi");
    graph.SetMarkerStyle(20);
    graph.SetMarkerSize(1.0);
    graph.GetXaxis()->SetTitle("lumi");
    graph.GetYaxis()->SetTitle("expected pvalue");
    graph.Draw("AP");
+   graph.SetMaximum(1.0e-1);
+   graph.SetMinimum(1.0e-7);
    c1.SaveAs("./plots/pval_vs_lumi.pdf");
 }
 
@@ -183,6 +194,6 @@ double plotter::lumi_to_nsignal(double lumi)
 {
    double crossSection = 49.85e-12;
    double BR = 2.28e-3;
-   double nsignal = lumi * 1.0e15 * crossSection * BR * acceptance_x_efficiency;
+   double nsignal = lumi * 1.0e15 * crossSection * BR * acceptance_x_efficiency * .8;
    return nsignal;
 }

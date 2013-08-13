@@ -36,7 +36,6 @@
 #include <numeric>
 #include <vector>
 
-
 using namespace std;
 using namespace RooFit;
 
@@ -50,6 +49,12 @@ public:
    float backgroundYield;
    int nSignal_gen;
    int nBackground_gen;
+   RooAbsPdf::GenSpec *genSpec_sig_mass;
+   RooAbsPdf::GenSpec *genSpec_sig_cosT;
+   RooAbsPdf::GenSpec *genSpec_bkg_mass;
+   RooAbsPdf::GenSpec *genSpec_bkg_cosT;
+
+
 
    RooDataSet *toyData;
    RooDataSet *extractedData;
@@ -59,6 +64,7 @@ public:
    void setNBins(int nbins) { cosT->setBins(nbins);}
    void setNSignal(double);
    void setPdfs(RooWorkspace *workspace) {ws = workspace;}
+   void prepare_gen();
    void generate_toy();
    void calculate_yield();
    void extract_signal();
