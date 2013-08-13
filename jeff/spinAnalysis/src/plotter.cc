@@ -118,15 +118,29 @@ void plotter::calculate()
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       thing.setNSignal(lumi_to_nsignal(*lumiIt));
-      vector<double> pvals;
+      double pvals[nToys];
       thing.prepare_gen();
+//      TCanvas c1;
+//      TH1F hist("hist","",10,.01,.25);
       for(int i=0; i<nToys; i++)
       {
 	 cout<<"making toy "<<i<<" at "<<*lumiIt<<"fb"<<endl;
 	 thing.generate_toy();
 	 thing.extract_signal();
-	 pvals.push_back(thing.getPvalue());
+	 pvals[i] = thing.getPvalue();
+//       hist.Fill(pvals[i]);
       }
+//      hist.Draw();
+//      c1.SaveAs("pval_dist.pdf");
+
+      double quantiles[3];
+      double prob[3]={.25,.5,.75};
+      TMath::Quantiles(nToys,3,pvals,quantiles,prob,kFALSE);
+
+      pvalue1stQuartile.push_back(quantiles[0]);
+      pvalueMedian.push_back(quantiles[1]);
+      pvalue3rdQuartile.push_back(quantiles[2]);
+/*
       double sum = std::accumulate(pvals.begin(), pvals.end(), 0.0);
       double meanPval = sum / pvals.size();
 
@@ -134,12 +148,13 @@ void plotter::calculate()
       double stdev = std::sqrt(sq_sum / pvals.size() - meanPval * meanPval);
       pvalueMean.push_back(meanPval);
       pvalueSigma.push_back(stdev);
+*/
    }
 
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       int index = lumiIt - lumi.begin();
-      cout<<"lumi is "<<lumi[index]<<";  pval mean is "<<pvalueMean[index]<<";  pval std is "<<pvalueSigma[index]<<endl;
+      cout<<"lumi is "<<lumi[index]<<";  pval Q1 is "<<pvalue1stQuartile[index]<<";  pval med is "<<pvalueMedian[index]<<";  pval Q3 is "<<pvalue3rdQuartile[index]<<endl;
    }
 }
 
@@ -164,20 +179,24 @@ void plotter::make_plot_lumi()
    int n = lumi.size();
    double x[n];
    double y[n];
-   double dx[n];
-   double dy[n];
+   double dx_low[n];
+   double dx_hi[n];
+   double dy_low[n];
+   double dy_hi[n];
 
    for(int i=0; i<n; i++)
    {
       x[i] = lumi[i];
-      y[i] = pvalueMean[i];
-      dy[i] = pvalueSigma[i];
-      dx[i] = 0.;
+      y[i] = pvalueMedian[i];
+      dy_low[i] = pvalue1stQuartile[i];
+      dy_hi[i] = pvalue3rdQuartile[i];
+      dx_low[i] = 0.;
+      dx_hi[i]  = 0.;
    }
 
    TCanvas c1;
    c1.SetLogy();
-   TGraphErrors graph(n,x,y,dx,dy);
+   TGraphAsymmErrors graph(n,x,y,dx_low,dx_hi, dy_low, dy_hi);
    graph.SetTitle("pval vs. lumi");
    graph.SetMarkerStyle(20);
    graph.SetMarkerSize(1.0);

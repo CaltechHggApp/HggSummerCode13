@@ -43,9 +43,9 @@ void Class2::calculate_yield()
    RooRealVar tempSigYield("tempSigYield","",0,5 * nSignal_gen);
    RooRealVar tempBkgYield("tempBkgYield","",0,5 * nBackground_gen);
    RooAddPdf model_mass("model_mass","",RooArgList( *(ws->pdf("model_sig_mass")), *(ws->pdf("model_bkg_mass")) ),RooArgList(tempSigYield,tempBkgYield));
-   model_mass.fitTo(*toyData,PrintLevel(-1));
-   signalYield = round(tempSigYield.getVal());
-   backgroundYield = round(tempBkgYield.getVal());
+//   model_mass.fitTo(*toyData,PrintLevel(-1));
+   signalYield = nSignal_gen;//round(tempSigYield.getVal());
+   backgroundYield = nBackground_gen;//round(tempBkgYield.getVal());
 
 //   cout<<"-signal yield is "<<signalYield<<endl;
 //   cout<<"-background yield is "<<backgroundYield<<endl;

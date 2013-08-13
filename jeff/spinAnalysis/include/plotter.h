@@ -60,8 +60,10 @@ public:
    RooDataSet *MC0;
    RooDataSet *MC2;
    vector<double> lumi;
-   vector<double> pvalueMean;
-   vector<double> pvalueSigma;
+   vector<double> pvalueMedian;
+   vector<double> pvalue1stQuartile;
+   vector<double> pvalue3rdQuartile;
+
 
    plotter();
    ~plotter();
