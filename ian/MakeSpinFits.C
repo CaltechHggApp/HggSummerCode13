@@ -856,6 +856,7 @@ void MakeSpinFits::MakeBackground(){
   RooDataSet Background_Combined(*((RooDataSet*)ws->data("Data_Combined")),"Background");
   for (auto mcIt=mcLabel.begin(); mcIt != mcLabel.end(); mcIt++){
     Background_Combined.append(*((RooDataSet*)ws->data(*mcIt+"_Combined")));
+    ws->import(Background_Combined);
   }
 }
 
@@ -905,6 +906,7 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
     RooRealVar *p2 = new RooRealVar(dataTag+Form("_BKGFIT_%s_p2",outputTag.Data()),"p2",0,-10,10);
     RooRealVar *p3 = new RooRealVar(dataTag+Form("_BKGFIT_%s_p3",outputTag.Data()),"p3",0,-10,10);
     RooRealVar *p4 = new RooRealVar(dataTag+Form("_BKGFIT_%s_p4",outputTag.Data()),"p4",0,-10,10);
+
     //enforce all coefficients positive
     RooFormulaVar *pCmod = new RooFormulaVar(dataTag+Form("_BKGFIT_%s_pCmod",outputTag.Data()),"","@0*@0",*pC);
     RooFormulaVar *p0mod = new RooFormulaVar(dataTag+Form("_BKGFIT_%s_p0mod",outputTag.Data()),"","@0*@0",*p0);
@@ -912,8 +914,6 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
     RooFormulaVar *p2mod = new RooFormulaVar(dataTag+Form("_BKGFIT_%s_p2mod",outputTag.Data()),"","@0*@0",*p2);
     RooFormulaVar *p3mod = new RooFormulaVar(dataTag+Form("_BKGFIT_%s_p3mod",outputTag.Data()),"","@0*@0",*p3);
     RooFormulaVar *p4mod = new RooFormulaVar(dataTag+Form("_BKGFIT_%s_p4mod",outputTag.Data()),"","@0*@0",*p4);
-
-  
 
     RooArgList *args;
     if(cosTlow > -1 || cosThigh < 1){
@@ -925,6 +925,17 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
     BkgShape = new RooBernstein(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"Background Model",mass,*args);
     break;
     }
+
+  case kPow:
+    {
+      //Power-law fit ~m^alpha
+    RooRealVar *alpha = new RooRealVar("alpha","",-10,0);
+
+    BkgShape = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"","mass^alpha",RooArgList(*mass,alpha));
+
+    break;
+    }
+
   default:
     std::cout << "INVALID BACKGROUND MODEL" << std::endl;
     assert(false);
