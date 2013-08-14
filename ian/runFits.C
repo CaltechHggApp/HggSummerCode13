@@ -11,11 +11,12 @@ int main(int argc, char** argv){
   ArgParser a(argc,argv);
   a.addArgument("InputWorkspace",ArgParser::required,"input workspace");
   a.addArgument("OutputWorkspace",ArgParser::required,"output workspace");
-  a.addLongOption("BkgFit",ArgParser::reqArg,"Background Fit Type [poly,exp] (default: exp)");
+  a.addLongOption("BkgFit",ArgParser::reqArg,"Background Fit Type [poly,exp,pow] (default: exp)");
   a.addLongOption("MCSamples",ArgParser::reqArg,"Specify the MC sample to process (comma separated) or none (default: all)");
   a.addLongOption("CrystalBall",ArgParser::noArg,"convolute a crystal ball with the signal model");
   a.addLongOption("DY",ArgParser::noArg,"Specify that we are fitting the Zee peak");
   a.addLongOption("FixPeak",ArgParser::noArg,"fix the peak position of the signal model at the generated mass");
+  a.addLongOption("BkgOnly",ArgParser::noArg,"only run the background fits");
 
   string ret;
   if(a.process(ret) != 0){
@@ -33,6 +34,7 @@ int main(int argc, char** argv){
   MakeSpinFits msf(inputWS,outputWS);
 
   if(fit.compare("poly")==0) msf.setBkgFit(MakeSpinFits::kPoly);
+  else if(fit.compare("pow")==0) msf.setBkgFit(MakeSpinFits::kPow);
   else msf.setBkgFit(MakeSpinFits::kExp);
 
   if(a.longFlagPres("MCSamples")) // specify the samples to test
@@ -53,9 +55,10 @@ int main(int argc, char** argv){
     else msf.setMeanRange(124,126,125);
   }
 
+  if(a.longFlagPres("BkgOnly")) msf.setMakeBkgOnly();
+
   msf.setAddSWeight(true);
   msf.run();
   msf.save();
 
 }
-
