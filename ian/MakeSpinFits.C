@@ -854,7 +854,7 @@ RooAbsPdf* MakeSpinFits::Make2DBkgModel(TString massMcName,TString costMcName,TS
 
 void MakeSpinFits::MakeBackground(){
   RooDataSet Background_Combined(*((RooDataSet*)ws->data("Data_Combined")),"Background");
-  for (auto mcIt=mcLabel.begin(); mcIt != mcLabel.end(); mcIt++){
+  for (vector<TString>::iterator mcIt=mcLabel.begin(); mcIt != mcLabel.end(); mcIt++){
     Background_Combined.append(*((RooDataSet*)ws->data(*mcIt+"_Combined")));
     ws->import(Background_Combined);
   }
@@ -928,11 +928,11 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
 
   case kPow:
     {
-      //Power-law fit ~m^alpha
-    RooRealVar *alpha = new RooRealVar("alpha","",-10,0);
+      //Power-law
 
-    BkgShape = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"","mass^alpha",RooArgList(*mass,alpha));
+    RooRealVar *alphapow = new RooRealVar("alphapow","",-10.0,0.0);
 
+    BkgShape = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"mass^alpha",RooArgList(*mass,alpha));
     break;
     }
 
