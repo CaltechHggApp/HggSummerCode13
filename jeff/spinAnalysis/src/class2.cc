@@ -84,7 +84,7 @@ void Class2::extract_signal()
 }
 
 
-void Class2::plot(TString plot_dir)
+void Class2::plot()
 {
    RooPlot* frame1 = cosT->frame();
    extractedData->reduce("cosT")->plotOn(frame1);
@@ -93,7 +93,7 @@ void Class2::plot(TString plot_dir)
    model_sig2_cosT->plotOn(frame1);
    TCanvas c1;
    frame1->Draw();
-   c1.SaveAs(plot_dir+"/extracted_sig_cosT.pdf");
+   c1.SaveAs("./plots/extracted_sig_cosT.pdf");
 
 /*
    RooPlot* frame2 = mass->frame();
@@ -103,20 +103,20 @@ void Class2::plot(TString plot_dir)
    frame2->Draw();
    c2.SaveAs(plot_dir+"/extracted_sig_mass.pdf");
 */
-
+/*
    RooPlot* frame3 = cosT->frame();
    toyData->reduce("cosT")->plotOn(frame3);
    toyData->statOn(frame3,Layout(0.55,0.99,0.8));
    TCanvas c3;
    frame3->Draw();
    c3.SaveAs(plot_dir+"/toyData_cosT.pdf");
-
+*/
    RooPlot* frame4 = mass->frame();
    toyData->reduce("mass")->plotOn(frame4);
    toyData->statOn(frame4,Layout(0.55,0.99,0.8));
    TCanvas c4;
    frame4->Draw();
-   c4.SaveAs(plot_dir+"/toyData_mass.pdf");
+   c4.SaveAs("./plots/toyData_mass.pdf");
 }
 
 
