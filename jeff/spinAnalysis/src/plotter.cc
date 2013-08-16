@@ -134,7 +134,7 @@ void plotter::calculate()
 //      c1.SaveAs("pval_dist.pdf");
 
       double quantiles[3];
-      double prob[3]={.25,.5,.75};
+      double prob[3]={.159,.5,.841};
       TMath::Quantiles(nToys,3,pvals,quantiles,prob,kFALSE);
 
       pvalue1stQuartile.push_back(quantiles[0]);
@@ -168,12 +168,12 @@ void plotter::make_plot_of_toy()
    thing.prepare_gen();
    thing.generate_toy();
    thing.extract_signal();
-   thing.plot(plot_dir);
+   thing.plot();
    thing.getPvalue();
 
 }
 
-void plotter::make_plot_lumi()
+void plotter::make_plot_lumi(TString filename)
 {
    cout<<"\nMAKING PVALUE VS LUMI PLOT"<<endl;
    int n = lumi.size();
@@ -194,18 +194,18 @@ void plotter::make_plot_lumi()
       dx_hi[i]  = 0.;
    }
 
-   TCanvas c1;
-   c1.SetLogy();
+   TFile f("./plots/"+ filename,"recreate");
    TGraphAsymmErrors graph(n,x,y,dx_low,dx_hi, dy_low, dy_hi);
+   graph.SetName("graph");
    graph.SetTitle("pval vs. lumi");
    graph.SetMarkerStyle(20);
    graph.SetMarkerSize(1.0);
    graph.GetXaxis()->SetTitle("lumi");
    graph.GetYaxis()->SetTitle("expected pvalue");
-   graph.Draw("AP");
    graph.SetMaximum(1.0e-1);
    graph.SetMinimum(1.0e-7);
-   c1.SaveAs("./plots/pval_vs_lumi.pdf");
+   graph.Write();
+   f.Close();
 }
 
 

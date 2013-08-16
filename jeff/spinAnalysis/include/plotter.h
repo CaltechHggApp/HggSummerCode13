@@ -45,7 +45,6 @@ class plotter
 public:
    double etaMax;
    TString MC_filename;
-   TString plot_dir;
    double plotLumi;
    int nBins;
    int nToys;
@@ -71,13 +70,12 @@ public:
    void setMCFilename(TString filename) {MC_filename = filename;}
    void setNBins(int nbins){nBins = nbins;}
    void setLumi(double luminosity) {plotLumi = luminosity;}
-   void setPlotDirectory(TString dir) {plot_dir = dir;}
    void setNToys(int n) {nToys = n;}
    void setLumis(vector<double> numbers) {lumi = numbers;}
    void makePdfs();
    void make_plot_of_toy();
    void calculate();
-   void make_plot_lumi();
+   void make_plot_lumi(TString filename);
    void make_plot_sigma();
    void readMC();
    RooDataSet* applyCuts(RooDataSet *originalData);

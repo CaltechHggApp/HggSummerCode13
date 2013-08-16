@@ -68,7 +68,7 @@ public:
    void generate_toy();
    void calculate_yield();
    void extract_signal();
-   void plot(TString);
+   void plot();
    double getPvalue();
 
 };

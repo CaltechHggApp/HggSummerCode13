@@ -14,10 +14,10 @@ int main()
    float lumi = atof(cfgReader.getParameter("luminosity").c_str());
    int nBins = atoi(cfgReader.getParameter("number_of_bins").c_str());
    int nToys = atoi(cfgReader.getParameter("number_of_toys").c_str());
-   string mc_filename = cfgReader.getParameter("MC_output_filename");
-   string plot_dir = cfgReader.getParameter("plot_directory");
+   string mc_filename = cfgReader.getParameter("MC_filename");
    string luminosities = cfgReader.getParameter("luminosities");
    vector<string> luminositiesVec = cfgReader.tokenizeString(luminosities,",");
+   string plot_filename = cfgReader.getParameter("plot_filename");
 
 
    cout<<"maxEta is "<<maxEta<<endl;
@@ -43,7 +43,6 @@ int main()
    // Make plots for a single toy
    walter.setMaxEta(maxEta);
    walter.setMCFilename(mc_filename);
-   walter.setPlotDirectory(plot_dir);
    walter.setLumi(lumi);
    walter.setLumis(lumis);
    walter.setNBins(nBins);
@@ -55,7 +54,7 @@ int main()
 
    // Make plots for many toys
    walter.calculate();
-   walter.make_plot_lumi();
+   walter.make_plot_lumi(plot_filename);
 
    return 0;
 }
