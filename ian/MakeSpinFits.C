@@ -863,13 +863,21 @@ RooAbsPdf* MakeSpinFits::Make2DBkgModel(TString massMcName,TString costMcName,TS
 //   }
 // }
 
+  //Background_Combined.append(*((RooDataSet*)ws->data(*mcIt+"_Combined")));    
+  //RooDataSet Background_Combined(*((RooDataSet*)ws->data("_Combined")),"Background_Combined");
+
 
 void MakeSpinFits::MakeBackground(){
-  RooDataSet Background_Combined(*((RooDataSet*)ws->data("Data_Combined")),"Background_Combined");
+  RooDataSet *Background_Combined=0;
   for (auto mcIt=mcLabel.begin(); mcIt != mcLabel.end(); mcIt++){
-    Background_Combined.append(*((RooDataSet*)ws->data(*mcIt+"_Combined")));
-  ws->import(Background_Combined);
+    RooDataSet *mc = (RooDataSet*)ws->data(*mcIt+"_Combined");
+    if( TString(mc->GetTitle()) != "type-1") continue;
+    if(mc->numEntries()==0) continue;
+    if( *mcIt == "DYToLL-M50") continue;
+    if(Background_Combined==0) Background_Combined = new RooDataSet( *mc,"Background_Combined");
+    else Background_Combined->append(*mc);
   }
+  if(Background_Combined) ws->import(*Background_Combined);
 }
 
 
@@ -941,9 +949,9 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
   case kPow:
     {
       //Power-law fit 
-    RooRealVar *alphapow = new RooRealVar("alphapow","",-10.0,0.0);
+      RooRealVar *alphapow = new RooRealVar(dataTag+Form("_BKGFIT_%s_alpha",outputTag.Data()),"",-10.0,0.0);
 
-    BkgShape = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"","mass^alpha",RooArgList(mass,*alphapow));
+    BkgShape = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"","@0^@1",RooArgList(mass,*alphapow));
     break;
     }
 
