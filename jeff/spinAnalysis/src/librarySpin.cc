@@ -8,11 +8,11 @@ float smear(float energy, float eta, float EB_res, float EE_res)
    TRandom3 random(0);
    if(fabs(eta) < 1.4)
    {
-      return energy * (1 + random.Gaus(0,.01));
+      return energy * (1 + random.Gaus(0,EB_res));
    }
    if(fabs(eta) > 1.4)
    {
-      return energy * (1 + random.Gaus(0,.04));
+      return energy * (1 + random.Gaus(0,EE_res));
    }
 }
 

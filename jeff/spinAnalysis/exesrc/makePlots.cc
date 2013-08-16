@@ -10,6 +10,9 @@ int main()
 {
    ReadConfig cfgReader("config.cfg");
 
+   int single = atoi(cfgReader.getParameter("make_single_plot").c_str());
+   int multi = atoi(cfgReader.getParameter("make_multi_plot").c_str());
+
    float maxEta = atof(cfgReader.getParameter("maximum_eta").c_str());
    float lumi = atof(cfgReader.getParameter("luminosity").c_str());
    int nBins = atoi(cfgReader.getParameter("number_of_bins").c_str());
@@ -49,12 +52,15 @@ int main()
    walter.setNToys(nToys);
 
    walter.makePdfs();
-   walter.make_plot_of_toy();
+   if(single) walter.make_plot_of_toy();
 
 
    // Make plots for many toys
-   walter.calculate();
-   walter.make_plot_lumi(plot_filename);
+   if(multi)
+   {
+      walter.calculate();
+      walter.make_plot_lumi(plot_filename);
+   }
 
    return 0;
 }

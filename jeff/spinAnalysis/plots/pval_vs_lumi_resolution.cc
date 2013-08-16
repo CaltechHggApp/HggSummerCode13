@@ -1,4 +1,4 @@
-void res()
+void pval_vs_lumi_resolution()
 {
    TCanvas c1("c1","");
    c1.SetLogy();
@@ -10,7 +10,7 @@ void res()
    gAge->Draw("AP");
    gAge->GetXaxis()->SetTitle("#int L");
    gAge->GetYaxis()->SetTitle("p-value (expected)");
-   gAge->SetTitle("ECAL Resolution: high pilup, current, optimistic");
+   gAge->SetTitle("");
 
 
 
@@ -55,18 +55,5 @@ void res()
    l5.SetLineStyle(3);
    l5.Draw();
 
-
-
-   TPaveText text(.1,.3,.2,.4);
-   text.AddText("3 sigma");
-   text.Draw();
-
-
-   TLatex *prelim = new TLatex(8.,1.0e-5,"CMS Preliminary");
-   prelim->SetNDC();
-   prelim->SetTextSize(0.045);
-   prelim->SetTextColor(kBlack);
-   prelim->Draw();
-
-   c1.SaveAs("plot.pdf");
+   c1.SaveAs("plot_res.pdf");
 }

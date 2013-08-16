@@ -6,14 +6,12 @@ void Class2::setNSignal(double nsig)
 {
    nSignal_gen = round(nsig);
    nBackground_gen = round(20 * nSignal_gen);
-//   cout<<"-number of signal at this lumi after acceptance cuts: "<<nSignal_gen<<endl;
 }
 
 
 void Class2::prepare_gen()
 {
    genSpec_sig_mass = ws->pdf("model_sig_mass")->prepareMultiGen(*mass, NumEvents(nSignal_gen));
-//   genSpec_sig_cosT = ws->pdf("model_sig_cosT")->prepareMultiGen(*cosT,NumEvents(1000));
    genSpec_bkg_mass = ws->pdf("model_bkg_mass")->prepareMultiGen(*mass, NumEvents(nBackground_gen));
    genSpec_bkg_cosT = ws->pdf("model_bkg_cosT")->prepareMultiGen(*cosT, NumEvents(nBackground_gen));
 }
@@ -22,13 +20,11 @@ void Class2::generate_toy()
 {
    RooDataSet *toySignal;
    toySignal = ws->pdf("model_sig_mass")->generate(*genSpec_sig_mass);
-   toySignal->merge(ws->pdf("model_sig0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false))); //autobinned
-//   cout<<"-generated "<<nSignal_gen<<" signal events"<<endl;
+   toySignal->merge(ws->pdf("model_sig0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false))); 
 
    RooDataSet *toyBkg;
    toyBkg= ws->pdf("model_bkg_mass")->generate(*genSpec_bkg_mass);
    toyBkg->merge(ws->pdf("model_bkg_cosT")->generate(*genSpec_bkg_cosT));
-//   cout<<"-generated "<<nBackground_gen<<" background events"<<endl;
 
    toyData = new RooDataSet("toyData","",RooArgSet(*mass, *cosT));
    toyData->append(*toySignal);
@@ -46,9 +42,6 @@ void Class2::calculate_yield()
 //   model_mass.fitTo(*toyData,PrintLevel(-1));
    signalYield = nSignal_gen;//round(tempSigYield.getVal());
    backgroundYield = nBackground_gen;//round(tempBkgYield.getVal());
-
-//   cout<<"-signal yield is "<<signalYield<<endl;
-//   cout<<"-background yield is "<<backgroundYield<<endl;
 }
 
 void Class2::extract_signal()
@@ -88,7 +81,7 @@ void Class2::plot()
 {
    RooPlot* frame1 = cosT->frame();
    extractedData->reduce("cosT")->plotOn(frame1);
-   extractedData->statOn(frame1,Layout(0.55,0.99,0.8));
+//   extractedData->statOn(frame1,Layout(0.55,0.99,0.8));
    RooAbsPdf *model_sig2_cosT = ws->pdf("model_sig2_cosT");
    model_sig2_cosT->plotOn(frame1);
    TCanvas c1;
@@ -103,17 +96,17 @@ void Class2::plot()
    frame2->Draw();
    c2.SaveAs(plot_dir+"/extracted_sig_mass.pdf");
 */
-/*
+
    RooPlot* frame3 = cosT->frame();
    toyData->reduce("cosT")->plotOn(frame3);
-   toyData->statOn(frame3,Layout(0.55,0.99,0.8));
+//   toyData->statOn(frame3,Layout(0.55,0.99,0.8));
    TCanvas c3;
    frame3->Draw();
-   c3.SaveAs(plot_dir+"/toyData_cosT.pdf");
-*/
+   c3.SaveAs("./plots/toyData_cosT.pdf");
+
    RooPlot* frame4 = mass->frame();
    toyData->reduce("mass")->plotOn(frame4);
-   toyData->statOn(frame4,Layout(0.55,0.99,0.8));
+//   toyData->statOn(frame4,Layout(0.55,0.99,0.8));
    TCanvas c4;
    frame4->Draw();
    c4.SaveAs("./plots/toyData_mass.pdf");
