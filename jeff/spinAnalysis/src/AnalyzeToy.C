@@ -36,12 +36,20 @@ void AnalyzeToy::generate_toy()
 
 void AnalyzeToy::calculate_yield()
 {
-   RooRealVar tempSigYield("tempSigYield","",0,5 * nSignal_gen);
-   RooRealVar tempBkgYield("tempBkgYield","",0,5 * nBackground_gen);
-   RooAddPdf model_mass("model_mass","",RooArgList( *(ws->pdf("model_sig_mass")), *(ws->pdf("model_bkg_mass")) ),RooArgList(tempSigYield,tempBkgYield));
-//   model_mass.fitTo(*toyData,PrintLevel(-1));
-   signalYield = nSignal_gen;//round(tempSigYield.getVal());
-   backgroundYield = nBackground_gen;//round(tempBkgYield.getVal());
+   if(cheat)
+   {
+      signalYield = nSignal_gen;
+      backgroundYield = nBackground_gen;
+   }
+   else
+   {
+      RooRealVar tempSigYield("tempSigYield","",0,5 * nSignal_gen);
+      RooRealVar tempBkgYield("tempBkgYield","",0,5 * nBackground_gen);
+      RooAddPdf model_mass("model_mass","",RooArgList( *(ws->pdf("model_sig_mass")), *(ws->pdf("model_bkg_mass")) ),RooArgList(tempSigYield,tempBkgYield));
+      model_mass.fitTo(*toyData,PrintLevel(-1));
+      signalYield = round(tempSigYield.getVal());
+      backgroundYield = round(tempBkgYield.getVal());
+   }
 }
 
 void AnalyzeToy::extract_signal()

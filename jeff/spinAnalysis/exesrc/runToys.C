@@ -8,34 +8,36 @@ using namespace RooFit;
 
 int main()
 {
+   // process config file
    ReadConfig cfgReader("config.cfg");
-
-   int single = atoi(cfgReader.getParameter("make_single_plot").c_str());
-   int multi = atoi(cfgReader.getParameter("make_multi_plot").c_str());
-
-   float maxEta = atof(cfgReader.getParameter("maximum_eta").c_str());
-   float lumi = atof(cfgReader.getParameter("luminosity").c_str());
    int nBins = atoi(cfgReader.getParameter("number_of_bins").c_str());
    int nToys = atoi(cfgReader.getParameter("number_of_toys").c_str());
-   string mc_filename = cfgReader.getParameter("MC_filename");
-   string luminosities = cfgReader.getParameter("luminosities");
-   vector<string> luminositiesVec = cfgReader.tokenizeString(luminosities,",");
-   string plot_filename = cfgReader.getParameter("plot_filename");
+   int cheat = strcmp("false",cfgReader.getParameter("cheat").c_str() );
+   TString res_label = cfgReader.getParameter("use_res_label");
 
+   string labels_temp = cfgReader.getParameter("eta_labels");
+   vector<string> labels = cfgReader.tokenizeString(labels_temp,",");
 
-   cout<<"maxEta is "<<maxEta<<endl;
-   cout<<"lumi is "<<lumi<<endl;
-   cout<<"nBins is "<<nBins<<endl;
-   cout<<"nToys is "<<nToys<<endl;
-
-
-
+   string lumis_temp = cfgReader.getParameter("luminosities");
+   vector<string> lumis_temp2 = cfgReader.tokenizeString(lumis_temp,",");
    vector<double> lumis;
-   for(vector<string>::iterator it = luminositiesVec.begin(); it!=luminositiesVec.end(); it++)
+   for(vector<string>::iterator it = lumis_temp2.begin(); it!=lumis_temp2.end(); it++)
    {
       double num = atof(it->c_str());
       lumis.push_back(num);
    }
+
+   string etas_temp = cfgReader.getParameter("eta_limits");
+   vector<string> etas_temp2 = cfgReader.tokenizeString(etas_temp,",");
+   vector<double> etas;
+   for(vector<string>::iterator it = etas_temp2.begin(); it!=etas_temp2.end(); it++)
+   {
+      double num = atof(it->c_str());
+      etas.push_back(num);
+   }
+
+   
+
 
    // Set seed
    (RooRandom::randomGenerator())->SetSeed(0);
@@ -43,23 +45,25 @@ int main()
    RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
    MakeToys walter;
-   // Make plots for a single toy
-   walter.setMaxEta(maxEta);
-   walter.setMCFilename(mc_filename);
-   walter.setLumi(lumi);
    walter.setLumis(lumis);
    walter.setNBins(nBins);
    walter.setNToys(nToys);
+   walter.setCheat(cheat);
 
-   walter.makePdfs();
-   if(single) walter.make_plot_of_toy();
-
-
-   // Make plots for many toys
-   if(multi)
+   for(int i=0; i<labels.size(); i++)
    {
+      string label = labels[i];
+      walter.setMaxEta(etas[i]);
+
+      walter.setMCFilename("./tempData/2gg_" + res_label + ".root");
+      walter.makePdfs();
       walter.calculate();
-      walter.make_plot_lumi(plot_filename);
+      walter.make_plot_lumi( Form("./tempData/eta%s_gg.root",label.c_str()) );
+
+      walter.setMCFilename("./tempData/2qq_" + res_label + ".root");
+      walter.makePdfs();
+      walter.calculate();
+      walter.make_plot_lumi( Form("./tempData/eta%s_qq.root",label.c_str()) );
    }
 
    return 0;

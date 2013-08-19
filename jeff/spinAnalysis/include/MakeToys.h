@@ -48,7 +48,7 @@ public:
    double plotLumi;
    int nBins;
    int nToys;
-
+   int cheat;
 
    RooWorkspace *ws;
    double acceptance_x_efficiency;
@@ -70,6 +70,7 @@ public:
    void setMCFilename(TString filename) {MC_filename = filename;}
    void setNBins(int nbins){nBins = nbins;}
    void setLumi(double luminosity) {plotLumi = luminosity;}
+   void setCheat(int TrueFalse) {cheat = TrueFalse;}
    void setNToys(int n) {nToys = n;}
    void setLumis(vector<double> numbers) {lumi = numbers;}
    void makePdfs();

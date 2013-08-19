@@ -71,8 +71,9 @@ public :
    float EB_res;
    float EE_res;
 
-   AnalyzeMC(TTree*);
+   AnalyzeMC();
    ~AnalyzeMC();
+   void setData(TTree *tree);
    void Init_vecbos(TTree *tree);
    void Init_bacon(TTree *tree);
    void setResolution(float EB_res, float EE_res);

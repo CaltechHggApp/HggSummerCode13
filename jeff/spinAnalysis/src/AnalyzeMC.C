@@ -3,7 +3,16 @@
 
 using namespace std;
 
-AnalyzeMC::AnalyzeMC(TTree *tree)
+AnalyzeMC::AnalyzeMC()
+{
+}
+
+AnalyzeMC::~AnalyzeMC()
+{
+}
+
+
+void AnalyzeMC::setData(TTree *tree)
 {
    if(tree == 0)
    {
@@ -19,11 +28,6 @@ AnalyzeMC::AnalyzeMC(TTree *tree)
    }
 }
 
-
-AnalyzeMC::~AnalyzeMC()
-{
-   delete chain;
-}
 
 void AnalyzeMC::Init_vecbos(TTree *tree)
 {
@@ -55,8 +59,7 @@ void AnalyzeMC::Init_bacon(TTree *tree)
    chain->SetBranchAddress("GenParticle.mass", GenParticle_mass, &b_GenParticle_mass);
    chain->SetBranchAddress("GenParticle.pdgid", idMc, &b_GenParticle_pdgid);
    chain->SetBranchAddress("GenParticle.status", statusMc, &b_GenParticle_status);
-   chain->SetBranchAddress("GenParticle.motherPdgID", motherID, &b_GenParticle_motherPdgID)\
-      ;
+   chain->SetBranchAddress("GenParticle.motherPdgID", motherID, &b_GenParticle_motherPdgID);
    chain->SetBranchAddress("GenJet", &GenJet_, &b_GenJet_);
    chain->SetBranchAddress("Electron", &Electron_, &b_Electron_);
    chain->SetBranchAddress("Muon", &Muon_, &b_Muon_);
@@ -166,6 +169,7 @@ void AnalyzeMC::Loop(TString filename)
    outputFile.cd();
    outputFile.Write();
    outputFile.Close();
+   delete chain;
 
    cout<<"finished processing MC "<< endl;
 }

@@ -60,24 +60,6 @@ void MakeToys::makePdfs()
    ws->import(model_bkg_mass);
    ws->import(model_bkg_cosT);
 
-   TCanvas c1;
-   RooPlot *frame1 = cosT->frame();
-   model_sig0_cosT.plotOn(frame1,LineColor(kBlack));
-   frame1->SetTitle("");
-   frame1->SetXTitle("cos(#theta)");
-   frame1->SetYTitle("");
-   frame1->Draw();
-   c1.SaveAs("cosT_sig0.pdf");
-
-   TCanvas c2;
-   RooPlot *frame2 = cosT->frame();
-   model_sig2_cosT.plotOn(frame2,LineColor(kBlack));
-   frame2->SetTitle("");
-   frame2->SetXTitle("cos(#theta)");
-   frame2->SetYTitle("");
-   frame2->Draw();
-   c2.SaveAs("cosT_sig2.pdf");
-
    delete MC0;
    delete MC2;
 }
@@ -93,6 +75,13 @@ RooDataSet*  MakeToys::applyCuts(RooDataSet* originalData)
    RooDataSet *acceptedData = new RooDataSet("acceptedData","",RooArgSet(*mass,*cosT));
 
    int nEntries=originalData->numEntries();
+
+   if(nEntries == 0)
+   {
+      cout<<"error: no data in MC file. ./runMC needs to be done on t3-higgs"<<endl;
+      exit(-1);
+   }
+
    for(int i=0; i<nEntries; i++)
    {
       event = originalData->get(i);
@@ -114,11 +103,12 @@ void MakeToys::readMC()
    RooRealVar pt2("pt2","",0,500);
    RooRealVar maxEta("maxEta","",0,50);
 
-   TFile file0("./lib/0_" + MC_filename);
-   MC0 = new RooDataSet("MC0","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file0.Get("tree"))));
+   TFile file0(MC_filename);
+   TFile file2(MC_filename);
 
-   TFile file2("./lib/2_" + MC_filename);
+   MC0 = new RooDataSet("MC0","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file0.Get("tree"))));
    MC2 = new RooDataSet("MC2","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file2.Get("tree"))));
+
    file0.Close();
    file2.Close();
 }
@@ -128,13 +118,14 @@ void MakeToys::calculate()
    AnalyzeToy thing;
    thing.setPdfs(ws);
    thing.setNBins(nBins);
+   thing.setCheat(cheat);
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       thing.setNSignal(lumi_to_nsignal(*lumiIt));
       double pvals[nToys];
       thing.prepare_gen();
       gStyle->SetOptStat("orme");
-      TFile f("rawr.root","recreate");
+//      TFile f("rawr.root","recreate");
       TH1F hist("hist","",10,0,.01);
       hist.StatOverflows();
       for(int i=0; i<nToys; i++)
@@ -149,7 +140,7 @@ void MakeToys::calculate()
       hist.SetMarkerStyle(20);
       hist.GetXaxis()->SetTitle("p-value");
       hist.GetYaxis()->SetTitle("Events / ");
-      hist.Write();
+//      hist.Write();
       double quantiles[3];
       double prob[3]={.159,.5,.841};
       TMath::Quantiles(nToys,3,pvals,quantiles,prob,kFALSE);
@@ -202,7 +193,7 @@ void MakeToys::make_plot_lumi(TString filename)
       dx_hi[i]  = 0.;
    }
 
-   TFile f("./plots/"+ filename,"recreate");
+   TFile f(filename,"recreate");
    TGraphAsymmErrors graph(n,x,y,dx_low,dx_hi, dy_low, dy_hi);
    graph.SetName("graph");
    graph.SetTitle("pval vs. lumi");

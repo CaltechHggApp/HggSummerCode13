@@ -45,6 +45,7 @@ public:
    RooRealVar *mass;
    RooRealVar *cosT;
 
+   int cheat;
    float signalYield;
    float backgroundYield;
    int nSignal_gen;
@@ -63,6 +64,7 @@ public:
    ~AnalyzeToy();
    void setNBins(int nbins) { cosT->setBins(nbins);}
    void setNSignal(double);
+   void setCheat(int TrueFalse) {cheat = TrueFalse;}
    void setPdfs(RooWorkspace *workspace) {ws = workspace;}
    void prepare_gen();
    void generate_toy();
