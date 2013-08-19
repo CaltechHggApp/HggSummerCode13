@@ -135,7 +135,8 @@ public:
   static float computeFWHM(RooAbsPdf* pdf, float mean, RooRealVar* var); //!< compute the Full Width at Half Maximum for a pdf
   static float computeSigEff(RooAbsPdf* pdf,float mean, RooRealVar* var);//!< compute the sigma effective for a pdf
 
-  enum BkgFitType{kExp,kPoly,kPow}; //!< allowed types for background fit
+  enum BkgFitType{kExp,kPoly,kPow, kDPow}; //!< allowed types for background fit
+  //(Exp = Double Exponential, Poly = Polynomial, Pow = Power Law, DPow = Double Power Law)
 
   void setBkgFit(BkgFitType t){fitType=t;} //!< specify which type of background fit to use
   void setUseCrystalBall(){useCB=true;}    //!< specify to use a crystal ball in the signal fit

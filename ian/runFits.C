@@ -35,6 +35,7 @@ int main(int argc, char** argv){
 
   if(fit.compare("poly")==0) msf.setBkgFit(MakeSpinFits::kPoly);
   else if(fit.compare("pow")==0) msf.setBkgFit(MakeSpinFits::kPow);
+  else if(fit.compare("dpow")==0) msf.setBkgFit(MakeSpinFits::kDPow);
   else msf.setBkgFit(MakeSpinFits::kExp);
 
   if(a.longFlagPres("MCSamples")) // specify the samples to test
