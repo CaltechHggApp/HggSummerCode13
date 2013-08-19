@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "plotter.h"
+#include "MakeToys.h"
 #include "ReadConfig.hh"
 
 using namespace std;
@@ -42,7 +42,7 @@ int main()
    // Don't print dumb warnings
    RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
-   plotter walter;
+   MakeToys walter;
    // Make plots for a single toy
    walter.setMaxEta(maxEta);
    walter.setMCFilename(mc_filename);

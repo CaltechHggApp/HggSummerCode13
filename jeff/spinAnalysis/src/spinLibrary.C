@@ -1,4 +1,4 @@
-#include "librarySpin.h"
+#include "spinLibrary.h"
 
 using namespace std;
 

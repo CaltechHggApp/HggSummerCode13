@@ -1,11 +1,11 @@
-#include "plotter.h"
-#include "class2.h"
+#include "MakeToys.h"
+#include "AnalyzeToy.h"
 
 using namespace std;
 using namespace RooFit;
 
 
-plotter::plotter()
+MakeToys::MakeToys()
 {
    ws = new RooWorkspace("ws");
    mass = new RooRealVar("mass","diphoton mass",110,140);
@@ -13,7 +13,7 @@ plotter::plotter()
    mass->setBins(30);
 }
 
-plotter::~plotter()
+MakeToys::~MakeToys()
 {
    delete ws;
    delete mass;
@@ -21,7 +21,7 @@ plotter::~plotter()
 }
 
 
-void plotter::makePdfs()
+void MakeToys::makePdfs()
 {
    cosT->setBins(nBins);
    readMC();
@@ -83,7 +83,7 @@ void plotter::makePdfs()
 }
 
 
-RooDataSet*  plotter::applyCuts(RooDataSet* originalData)
+RooDataSet*  MakeToys::applyCuts(RooDataSet* originalData)
 {
    RooRealVar pt1("pt1","",0,500);
    RooRealVar pt2("pt2","",0,500);
@@ -108,7 +108,7 @@ RooDataSet*  plotter::applyCuts(RooDataSet* originalData)
    return acceptedData;
 }
 
-void plotter::readMC()
+void MakeToys::readMC()
 {
    RooRealVar pt1("pt1","",0,500);
    RooRealVar pt2("pt2","",0,500);
@@ -123,9 +123,9 @@ void plotter::readMC()
    file2.Close();
 }
 
-void plotter::calculate()
+void MakeToys::calculate()
 {
-   Class2 thing;
+   AnalyzeToy thing;
    thing.setPdfs(ws);
    thing.setNBins(nBins);
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
@@ -166,10 +166,10 @@ void plotter::calculate()
    }
 }
 
-void plotter::make_plot_of_toy()
+void MakeToys::make_plot_of_toy()
 {
    cout<<"\nMAKING PLOT OF SINGLE TOY"<<endl;
-   Class2 thing;
+   AnalyzeToy thing;
    thing.setNSignal(lumi_to_nsignal(plotLumi));
    thing.setPdfs(ws);
    thing.setNBins(nBins);
@@ -181,7 +181,7 @@ void plotter::make_plot_of_toy()
 
 }
 
-void plotter::make_plot_lumi(TString filename)
+void MakeToys::make_plot_lumi(TString filename)
 {
    cout<<"\nMAKING PVALUE VS LUMI PLOT"<<endl;
    int n = lumi.size();
@@ -217,7 +217,7 @@ void plotter::make_plot_lumi(TString filename)
 }
 
 
-double plotter::lumi_to_nsignal(double lumi)
+double MakeToys::lumi_to_nsignal(double lumi)
 {
    double crossSection = 49.85e-12;
    double BR = 2.28e-3;

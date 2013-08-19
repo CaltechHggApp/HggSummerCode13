@@ -1,22 +1,22 @@
-#include "class2.h"
+#include "AnalyzeToy.h"
 #include "MakeSpinSPlot.h"
 
 
-void Class2::setNSignal(double nsig)
+void AnalyzeToy::setNSignal(double nsig)
 {
    nSignal_gen = round(nsig);
    nBackground_gen = round(20 * nSignal_gen);
 }
 
 
-void Class2::prepare_gen()
+void AnalyzeToy::prepare_gen()
 {
    genSpec_sig_mass = ws->pdf("model_sig_mass")->prepareMultiGen(*mass, NumEvents(nSignal_gen));
    genSpec_bkg_mass = ws->pdf("model_bkg_mass")->prepareMultiGen(*mass, NumEvents(nBackground_gen));
    genSpec_bkg_cosT = ws->pdf("model_bkg_cosT")->prepareMultiGen(*cosT, NumEvents(nBackground_gen));
 }
 
-void Class2::generate_toy()
+void AnalyzeToy::generate_toy()
 {
    RooDataSet *toySignal;
    toySignal = ws->pdf("model_sig_mass")->generate(*genSpec_sig_mass);
@@ -34,7 +34,7 @@ void Class2::generate_toy()
    delete toyBkg;
 }
 
-void Class2::calculate_yield()
+void AnalyzeToy::calculate_yield()
 {
    RooRealVar tempSigYield("tempSigYield","",0,5 * nSignal_gen);
    RooRealVar tempBkgYield("tempBkgYield","",0,5 * nBackground_gen);
@@ -44,7 +44,7 @@ void Class2::calculate_yield()
    backgroundYield = nBackground_gen;//round(tempBkgYield.getVal());
 }
 
-void Class2::extract_signal()
+void AnalyzeToy::extract_signal()
 {
    calculate_yield();
    MakeSpinSPlot splotter(toyData);
@@ -77,7 +77,7 @@ void Class2::extract_signal()
 }
 
 
-void Class2::plot()
+void AnalyzeToy::plot()
 {
    RooPlot* frame1 = cosT->frame();
    extractedData->reduce("cosT")->plotOn(frame1);
@@ -113,7 +113,7 @@ void Class2::plot()
 }
 
 
-double Class2::getPvalue()
+double AnalyzeToy::getPvalue()
 {
    RooPlot* frame1 = cosT->frame();
    RooAbsData *data = extractedData->reduce("cosT");
@@ -132,7 +132,7 @@ double Class2::getPvalue()
 }
 
 
-Class2::Class2()
+AnalyzeToy::AnalyzeToy()
 {
    mass = new RooRealVar("mass","",110,140);
    cosT = new RooRealVar("cosT","",0.,1.);
@@ -140,7 +140,7 @@ Class2::Class2()
 }
 
 
-Class2::~Class2()
+AnalyzeToy::~AnalyzeToy()
 {
    delete mass;
    delete cosT;

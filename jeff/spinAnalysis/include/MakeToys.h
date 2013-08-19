@@ -1,5 +1,5 @@
-#ifndef splotter_h
-#define splotter_h
+#ifndef MakeToys_h
+#define MakeToys_h
 
 #include "TCanvas.h"
 #include <RooWorkspace.h>
@@ -40,7 +40,7 @@
 using namespace std;
 using namespace RooFit;
 
-class plotter
+class MakeToys
 {
 public:
    double etaMax;
@@ -64,8 +64,8 @@ public:
    vector<double> pvalue3rdQuartile;
 
 
-   plotter();
-   ~plotter();
+   MakeToys();
+   ~MakeToys();
    void setMaxEta(float eta){etaMax=eta;}
    void setMCFilename(TString filename) {MC_filename = filename;}
    void setNBins(int nbins){nBins = nbins;}

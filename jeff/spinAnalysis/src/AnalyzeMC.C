@@ -1,9 +1,9 @@
-#include "analyzerSpin.h"
-#include "librarySpin.h"
+#include "AnalyzeMC.h"
+#include "spinLibrary.h"
 
 using namespace std;
 
-HggSpin::HggSpin(TTree *tree)
+AnalyzeMC::AnalyzeMC(TTree *tree)
 {
    if(tree == 0)
    {
@@ -20,12 +20,12 @@ HggSpin::HggSpin(TTree *tree)
 }
 
 
-HggSpin::~HggSpin()
+AnalyzeMC::~AnalyzeMC()
 {
    delete chain;
 }
 
-void HggSpin::Init_vecbos(TTree *tree)
+void AnalyzeMC::Init_vecbos(TTree *tree)
 {
    chain = tree;
 
@@ -40,7 +40,7 @@ void HggSpin::Init_vecbos(TTree *tree)
 }
 
 
-void HggSpin::Init_bacon(TTree *tree)
+void AnalyzeMC::Init_bacon(TTree *tree)
 {
    chain = tree;
    chain->SetMakeClass(1);
@@ -66,7 +66,7 @@ void HggSpin::Init_bacon(TTree *tree)
    chain->SetBranchAddress("Vertex", &Vertex_, &b_Vertex_);
 }
 
-void HggSpin::GetEntry(Long64_t entry)
+void AnalyzeMC::GetEntry(Long64_t entry)
 {
    chain->GetEntry(entry);
 
@@ -91,14 +91,14 @@ void HggSpin::GetEntry(Long64_t entry)
 
 
 
-void HggSpin::setResolution(float barrel, float endcap)
+void AnalyzeMC::setResolution(float barrel, float endcap)
 {
    EB_res = barrel;
    EE_res = endcap;
 }
 
 
-void HggSpin::Loop(TString filename)
+void AnalyzeMC::Loop(TString filename)
 {
    TFile outputFile(filename, "recreate");
    TTree tree("tree","");

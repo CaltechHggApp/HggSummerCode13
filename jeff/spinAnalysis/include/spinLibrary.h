@@ -1,5 +1,5 @@
-#ifndef librarySpin_h
-#define librarySpin_h
+#ifndef spinLibrary_h
+#define spinLibrary_h
 
 #include <TROOT.h>
 #include <TTree.h>

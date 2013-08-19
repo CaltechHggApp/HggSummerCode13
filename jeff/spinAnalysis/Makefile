@@ -28,44 +28,41 @@ EXESRCDIR        = ./exesrc/
 CXX	         += -I$(INCLUDEDIR) -I$(INCLUDEDIRCOMMON) -I. -I$(INCLUDEDIRROOFIT)
 OUTLIB   	= ./lib/
 
-all: runMC makePlots
+all: runMC runToys
 
 clean:
 	rm -f $(OUTLIB)*.o
 	rm -f runMC
-	rm -f makePlots
+	rm -f runToys
 
 
 
-runMC:          $(EXESRCDIR)runMC.cc \
-                $(OUTLIB)analyzerSpin.o \
+runMC:          $(EXESRCDIR)runMC.C \
+                $(OUTLIB)AnalyzeMC.o \
 		$(HGGAPPINC)ReadConfig.hh \
-		$(OUTLIB)librarySpin.o
+		$(OUTLIB)spinLibrary.o
 	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o runMC $(OUTLIB)/*.o $(GLIBS) $<
 
 
-makePlots:	$(EXESRCDIR)makePlots.cc \
-		$(OUTLIB)class2.o \
-		$(OUTLIB)plotter.o \
+runToys:	$(EXESRCDIR)runToys.C \
+		$(OUTLIB)AnalyzeToy.o \
+		$(OUTLIB)MakeToys.o \
 		$(HGGAPPINC)ReadConfig.hh \
 		$(OUTLIB)MakeSpinSPlot.o
-	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o makePlots $(OUTLIB)/*.o $(GLIBS) $<
+	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o runToys $(OUTLIB)/*.o $(GLIBS) $<
 
 
-$(OUTLIB)analyzerSpin.o:	$(SRCDIR)analyzerSpin.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)analyzerSpin.o $<
+$(OUTLIB)AnalyzeMC.o:	$(SRCDIR)AnalyzeMC.C
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)AnalyzeMC.o $<
 
+$(OUTLIB)spinLibrary.o: $(SRCDIR)spinLibrary.C
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)spinLibrary.o $<
 
-$(OUTLIB)librarySpin.o: $(SRCDIR)librarySpin.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)librarySpin.o $<
+$(OUTLIB)AnalyzeToy.o: $(SRCDIR)AnalyzeToy.C
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)AnalyzeToy.o $<
 
-
-$(OUTLIB)class2.o: $(SRCDIR)class2.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)class2.o $<
-
-$(OUTLIB)plotter.o: $(SRCDIR)plotter.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)plotter.o $<
-
+$(OUTLIB)MakeToys.o: $(SRCDIR)MakeToys.C
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeToys.o $<
 
 $(OUTLIB)MakeSpinSPlot.o: $(SRCDIR)MakeSpinSPlot.C
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeSpinSPlot.o $<

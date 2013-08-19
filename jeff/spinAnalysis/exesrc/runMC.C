@@ -2,8 +2,8 @@
 #include <string>
 
 #include "ReadConfig.hh"
-#include "analyzerSpin.h"
-#include "librarySpin.h"
+#include "AnalyzeMC.h"
+#include "spinLibrary.h"
 
 using namespace std;
 
@@ -22,23 +22,23 @@ int main()
    // Run over spin 0 data
    cout<<"Running over spin0 MC"<<endl;
    TTree *tree0 = makeTree(0, allMC);
-   HggSpin analyzer0(tree0);
+   AnalyzeMC analyzer0(tree0);
    analyzer0.setResolution(EB_res, EE_res);
    analyzer0.Loop("./lib/0_" + filename);
 
    // Run over spin 2gg data
    cout<<"Running over spin2gg MC"<<endl;
    TTree *tree2 = makeTree(2,allMC);
-   HggSpin analyzer2(tree2);
+   AnalyzeMC analyzer2(tree2);
    analyzer2.setResolution(EB_res, EE_res);
    analyzer2.Loop("./lib/2g_" + filename);
 
    // Run over spin 2qq data
    cout<<"Running over spin2qq MC"<<endl;
    TTree *tree2q = makeTree(2,allMC);
-   HggSpin analyzer2q(tree2q);
-   analyzer2.setResolution(EB_res, EE_res);
-   analyzer2.Loop("./lib/2q_" + filename);
+   AnalyzeMC analyzer2q(tree2q);
+   analyzer2q.setResolution(EB_res, EE_res);
+   analyzer2q.Loop("./lib/2q_" + filename);
 
    return 0;
 }
