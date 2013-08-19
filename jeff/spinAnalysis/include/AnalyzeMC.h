@@ -1,5 +1,5 @@
-#ifndef analyzerSpin_h
-#define analyzerSpin_h
+#ifndef AnalyzeMC_h
+#define AnalyzeMC_h
 
 #include <iostream>
 #include <stdio.h>
@@ -23,7 +23,7 @@ using namespace std;
 
 const Int_t kMaxGenParticle = 500;
 
-class HggSpin {
+class AnalyzeMC {
 public :
    TTree   *chain;
 
@@ -71,8 +71,9 @@ public :
    float EB_res;
    float EE_res;
 
-   HggSpin(TTree*);
-   ~HggSpin();
+   AnalyzeMC();
+   ~AnalyzeMC();
+   void setData(TTree *tree);
    void Init_vecbos(TTree *tree);
    void Init_bacon(TTree *tree);
    void setResolution(float EB_res, float EE_res);

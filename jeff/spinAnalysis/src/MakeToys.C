@@ -1,11 +1,11 @@
-#include "plotter.h"
-#include "class2.h"
+#include "MakeToys.h"
+#include "AnalyzeToy.h"
 
 using namespace std;
 using namespace RooFit;
 
 
-plotter::plotter()
+MakeToys::MakeToys()
 {
    ws = new RooWorkspace("ws");
    mass = new RooRealVar("mass","diphoton mass",110,140);
@@ -13,7 +13,7 @@ plotter::plotter()
    mass->setBins(30);
 }
 
-plotter::~plotter()
+MakeToys::~MakeToys()
 {
    delete ws;
    delete mass;
@@ -21,7 +21,7 @@ plotter::~plotter()
 }
 
 
-void plotter::makePdfs()
+void MakeToys::makePdfs()
 {
    cosT->setBins(nBins);
    readMC();
@@ -42,15 +42,9 @@ void plotter::makePdfs()
    // signal pdf's
    RooGaussian model_sig_mass("model_sig_mass","",*mass,mean_sig_mass,sigma_sig_mass);
    model_sig_mass.fitTo(*(MC0->reduce("mass")),PrintLevel(-1));
-//   signalWidth = sigma_sig_mass->getVal();
 
    RooDataHist hist0("hist0","",*cosT, *(MC0->reduce("cosT")));
    RooHistPdf model_sig0_cosT("model_sig0_cosT","",*cosT,hist0);
-//   RooRealVar tempmean("tempmean","",.5,0,1);
-//   RooRealVar tempsig("tempsig","",.1,0,1);
-//   RooGaussian model_sig0_cosT("model_sig0_cosT","",*cosT,tempmean,tempsig);
-
-
 
    RooDataHist hist2("hist2","",*cosT, *(MC2->reduce("cosT")));
    RooHistPdf model_sig2_cosT("model_sig2_cosT","",*cosT,hist2);
@@ -65,12 +59,13 @@ void plotter::makePdfs()
    ws->import(model_sig2_cosT);
    ws->import(model_bkg_mass);
    ws->import(model_bkg_cosT);
+
    delete MC0;
    delete MC2;
 }
 
 
-RooDataSet*  plotter::applyCuts(RooDataSet* originalData)
+RooDataSet*  MakeToys::applyCuts(RooDataSet* originalData)
 {
    RooRealVar pt1("pt1","",0,500);
    RooRealVar pt2("pt2","",0,500);
@@ -80,6 +75,13 @@ RooDataSet*  plotter::applyCuts(RooDataSet* originalData)
    RooDataSet *acceptedData = new RooDataSet("acceptedData","",RooArgSet(*mass,*cosT));
 
    int nEntries=originalData->numEntries();
+
+   if(nEntries == 0)
+   {
+      cout<<"error: no data in MC file. ./runMC needs to be done on t3-higgs"<<endl;
+      exit(-1);
+   }
+
    for(int i=0; i<nEntries; i++)
    {
       event = originalData->get(i);
@@ -95,44 +97,50 @@ RooDataSet*  plotter::applyCuts(RooDataSet* originalData)
    return acceptedData;
 }
 
-void plotter::readMC()
+void MakeToys::readMC()
 {
    RooRealVar pt1("pt1","",0,500);
    RooRealVar pt2("pt2","",0,500);
    RooRealVar maxEta("maxEta","",0,50);
 
-   TFile file0("./lib/0_" + MC_filename);
-   MC0 = new RooDataSet("MC0","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file0.Get("tree"))));
+   TFile file0(MC_filename);
+   TFile file2(MC_filename);
 
-   TFile file2("./lib/2_" + MC_filename);
+   MC0 = new RooDataSet("MC0","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file0.Get("tree"))));
    MC2 = new RooDataSet("MC2","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file2.Get("tree"))));
+
    file0.Close();
    file2.Close();
 }
 
-void plotter::calculate()
+void MakeToys::calculate()
 {
-   Class2 thing;
+   AnalyzeToy thing;
    thing.setPdfs(ws);
    thing.setNBins(nBins);
+   thing.setCheat(cheat);
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
    {
       thing.setNSignal(lumi_to_nsignal(*lumiIt));
       double pvals[nToys];
       thing.prepare_gen();
-//      TCanvas c1;
-//      TH1F hist("hist","",10,.01,.25);
+      gStyle->SetOptStat("orme");
+//      TFile f("rawr.root","recreate");
+      TH1F hist("hist","",10,0,.01);
+      hist.StatOverflows();
       for(int i=0; i<nToys; i++)
       {
 	 cout<<"making toy "<<i<<" at "<<*lumiIt<<"fb"<<endl;
 	 thing.generate_toy();
 	 thing.extract_signal();
 	 pvals[i] = thing.getPvalue();
-//       hist.Fill(pvals[i]);
+       hist.Fill(pvals[i]);
       }
-//      hist.Draw();
-//      c1.SaveAs("pval_dist.pdf");
-
+      hist.SetLineColor(kBlack);
+      hist.SetMarkerStyle(20);
+      hist.GetXaxis()->SetTitle("p-value");
+      hist.GetYaxis()->SetTitle("Events / ");
+//      hist.Write();
       double quantiles[3];
       double prob[3]={.159,.5,.841};
       TMath::Quantiles(nToys,3,pvals,quantiles,prob,kFALSE);
@@ -140,15 +148,6 @@ void plotter::calculate()
       pvalue1stQuartile.push_back(quantiles[0]);
       pvalueMedian.push_back(quantiles[1]);
       pvalue3rdQuartile.push_back(quantiles[2]);
-/*
-      double sum = std::accumulate(pvals.begin(), pvals.end(), 0.0);
-      double meanPval = sum / pvals.size();
-
-      double sq_sum = std::inner_product(pvals.begin(), pvals.end(), pvals.begin(), 0.0);
-      double stdev = std::sqrt(sq_sum / pvals.size() - meanPval * meanPval);
-      pvalueMean.push_back(meanPval);
-      pvalueSigma.push_back(stdev);
-*/
    }
 
    for(vector<double>::iterator lumiIt = lumi.begin(); lumiIt != lumi.end(); lumiIt++)
@@ -158,10 +157,10 @@ void plotter::calculate()
    }
 }
 
-void plotter::make_plot_of_toy()
+void MakeToys::make_plot_of_toy()
 {
    cout<<"\nMAKING PLOT OF SINGLE TOY"<<endl;
-   Class2 thing;
+   AnalyzeToy thing;
    thing.setNSignal(lumi_to_nsignal(plotLumi));
    thing.setPdfs(ws);
    thing.setNBins(nBins);
@@ -169,11 +168,11 @@ void plotter::make_plot_of_toy()
    thing.generate_toy();
    thing.extract_signal();
    thing.plot();
-   thing.getPvalue();
+   cout<<"pval of plot is "<<thing.getPvalue()<<endl;
 
 }
 
-void plotter::make_plot_lumi(TString filename)
+void MakeToys::make_plot_lumi(TString filename)
 {
    cout<<"\nMAKING PVALUE VS LUMI PLOT"<<endl;
    int n = lumi.size();
@@ -194,7 +193,7 @@ void plotter::make_plot_lumi(TString filename)
       dx_hi[i]  = 0.;
    }
 
-   TFile f("./plots/"+ filename,"recreate");
+   TFile f(filename,"recreate");
    TGraphAsymmErrors graph(n,x,y,dx_low,dx_hi, dy_low, dy_hi);
    graph.SetName("graph");
    graph.SetTitle("pval vs. lumi");
@@ -209,7 +208,7 @@ void plotter::make_plot_lumi(TString filename)
 }
 
 
-double plotter::lumi_to_nsignal(double lumi)
+double MakeToys::lumi_to_nsignal(double lumi)
 {
    double crossSection = 49.85e-12;
    double BR = 2.28e-3;

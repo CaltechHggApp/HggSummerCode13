@@ -1,5 +1,5 @@
-#ifndef class2_h
-#define class2_h
+#ifndef AnalyzeToy_h
+#define AnalyzeToy_h
 
 #include "TCanvas.h"
 #include <RooWorkspace.h>
@@ -39,12 +39,13 @@
 using namespace std;
 using namespace RooFit;
 
-class Class2 {
+class AnalyzeToy {
 public:
    RooWorkspace *ws;
    RooRealVar *mass;
    RooRealVar *cosT;
 
+   int cheat;
    float signalYield;
    float backgroundYield;
    int nSignal_gen;
@@ -59,10 +60,11 @@ public:
    RooDataSet *toyData;
    RooDataSet *extractedData;
 
-   Class2();
-   ~Class2();
+   AnalyzeToy();
+   ~AnalyzeToy();
    void setNBins(int nbins) { cosT->setBins(nbins);}
    void setNSignal(double);
+   void setCheat(int TrueFalse) {cheat = TrueFalse;}
    void setPdfs(RooWorkspace *workspace) {ws = workspace;}
    void prepare_gen();
    void generate_toy();

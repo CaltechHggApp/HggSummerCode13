@@ -1,9 +1,18 @@
-#include "analyzerSpin.h"
-#include "librarySpin.h"
+#include "AnalyzeMC.h"
+#include "spinLibrary.h"
 
 using namespace std;
 
-HggSpin::HggSpin(TTree *tree)
+AnalyzeMC::AnalyzeMC()
+{
+}
+
+AnalyzeMC::~AnalyzeMC()
+{
+}
+
+
+void AnalyzeMC::setData(TTree *tree)
 {
    if(tree == 0)
    {
@@ -20,12 +29,7 @@ HggSpin::HggSpin(TTree *tree)
 }
 
 
-HggSpin::~HggSpin()
-{
-   delete chain;
-}
-
-void HggSpin::Init_vecbos(TTree *tree)
+void AnalyzeMC::Init_vecbos(TTree *tree)
 {
    chain = tree;
 
@@ -40,7 +44,7 @@ void HggSpin::Init_vecbos(TTree *tree)
 }
 
 
-void HggSpin::Init_bacon(TTree *tree)
+void AnalyzeMC::Init_bacon(TTree *tree)
 {
    chain = tree;
    chain->SetMakeClass(1);
@@ -55,8 +59,7 @@ void HggSpin::Init_bacon(TTree *tree)
    chain->SetBranchAddress("GenParticle.mass", GenParticle_mass, &b_GenParticle_mass);
    chain->SetBranchAddress("GenParticle.pdgid", idMc, &b_GenParticle_pdgid);
    chain->SetBranchAddress("GenParticle.status", statusMc, &b_GenParticle_status);
-   chain->SetBranchAddress("GenParticle.motherPdgID", motherID, &b_GenParticle_motherPdgID)\
-      ;
+   chain->SetBranchAddress("GenParticle.motherPdgID", motherID, &b_GenParticle_motherPdgID);
    chain->SetBranchAddress("GenJet", &GenJet_, &b_GenJet_);
    chain->SetBranchAddress("Electron", &Electron_, &b_Electron_);
    chain->SetBranchAddress("Muon", &Muon_, &b_Muon_);
@@ -66,7 +69,7 @@ void HggSpin::Init_bacon(TTree *tree)
    chain->SetBranchAddress("Vertex", &Vertex_, &b_Vertex_);
 }
 
-void HggSpin::GetEntry(Long64_t entry)
+void AnalyzeMC::GetEntry(Long64_t entry)
 {
    chain->GetEntry(entry);
 
@@ -91,14 +94,14 @@ void HggSpin::GetEntry(Long64_t entry)
 
 
 
-void HggSpin::setResolution(float barrel, float endcap)
+void AnalyzeMC::setResolution(float barrel, float endcap)
 {
    EB_res = barrel;
    EE_res = endcap;
 }
 
 
-void HggSpin::Loop(TString filename)
+void AnalyzeMC::Loop(TString filename)
 {
    TFile outputFile(filename, "recreate");
    TTree tree("tree","");
@@ -166,6 +169,7 @@ void HggSpin::Loop(TString filename)
    outputFile.cd();
    outputFile.Write();
    outputFile.Close();
+   delete chain;
 
    cout<<"finished processing MC "<< endl;
 }

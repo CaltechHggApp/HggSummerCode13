@@ -1,5 +1,5 @@
-#ifndef librarySpin_h
-#define librarySpin_h
+#ifndef spinLibrary_h
+#define spinLibrary_h
 
 #include <TROOT.h>
 #include <TTree.h>
@@ -34,5 +34,5 @@ Float_t calculateHelicity(TLorentzVector gamma1, TLorentzVector gamma2);
 
 Float_t calculateAngle_cs(TLorentzVector gamma1, TLorentzVector gamma2);
 
-TTree* makeTree(int spin, int all);
+TTree* makeTree(TString spin, int all);
 #endif
