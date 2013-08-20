@@ -8,9 +8,9 @@ spin measurement.
 
 To run the code:
 make
-./runMC          (must be run from t3-higgs) (~5 minutes)
-./runToys        (plots are saved in ./plots by default) (can take an hour)
-./runPlots       (instant)
+./runMC          (must be run from t3-higgs) (~5 minutes) (writes files in ./tempData )
+./runToys        (can take an hour) (writes files in ./tempData )
+./runPlots       (instant) (plots are saved in ./plots by default)
 
 
 Options:

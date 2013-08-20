@@ -74,6 +74,7 @@ int main()
       cout<<endl;
    }
 
+
    // for resolution plot
    walter.setMaxEta(2.5); //flag!
    for(int i=0; i<res_labels.size(); i++)
@@ -90,6 +91,7 @@ int main()
       cout<<endl;
    }
 
+
    // for gg vs. qqbar
    walter.setMC0Filename(Form("./tempData/MC_0_%s.root",resLabel_for_etaPlot.c_str()) );
    walter.setMC2Filename(Form("./tempData/MC_2qq_%s.root",resLabel_for_etaPlot.c_str()) );
@@ -98,6 +100,7 @@ int main()
    walter.calculate();
    walter.make_plot_lumi( Form("./tempData/toys_2qq_%s_%s.root",resLabel_for_etaPlot.c_str(),etaLabel_for_resPlot.c_str()) );
    cout<<endl;
+
 
    stopwatch.Stop();
    cout<<"Real Time: "<<stopwatch.RealTime()/60.0<<" minutes"<<endl;

@@ -32,6 +32,7 @@ all: runMC runToys runPlots
 
 clean:
 	rm -f $(OUTLIB)*.o
+#	rm -f ./tempData/*.root
 	rm -f runMC
 	rm -f runToys
 	rm -f runPlots

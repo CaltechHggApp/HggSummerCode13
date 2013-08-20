@@ -32,7 +32,7 @@ void MakeToys::makePdfs()
    acceptance_x_efficiency = (float)n_after / (float)n_before;
 
    // these are just to define the pfd's and aren't used anywhere else
-   RooRealVar mean_sig_mass("mean_sig_mass","",125,80,160);
+   RooRealVar mean_sig_mass("mean_sig_mass","",125,123,126);
    RooRealVar sigma_sig_mass("sigma_sig_mass","",2,0,10);
    RooRealVar c_bkg_mass("c_bkg_mass","",-.05,-5,5);
    RooRealVar p1_bkg_cosT("p1_bkg_cosT","",0,-100,100);
@@ -66,7 +66,7 @@ void MakeToys::makePdfs()
 }
 
 
-RooDataSet*  MakeToys::applyCuts(RooDataSet* originalData)
+RooDataSet*  MakeToys::applyCuts(RooDataSet *originalData)
 {
    RooRealVar pt1("pt1","",0,500);
    RooRealVar pt2("pt2","",0,500);
@@ -175,7 +175,6 @@ void MakeToys::make_plot_of_toy()
 
 void MakeToys::make_plot_lumi(TString filename)
 {
-//   cout<<"\nMAKING PVALUE VS LUMI PLOT"<<endl;
    int n = lumi.size();
    double x[n];
    double y[n];
@@ -206,6 +205,7 @@ void MakeToys::make_plot_lumi(TString filename)
 //   graph.SetMinimum(1.0e-7);
    graph.Write();
    f.Close();
+   cout<<"pval_vs_lumi data saved"<<endl;
    pvalueMedian.clear();
    pvalue1stQuartile.clear();
    pvalue3rdQuartile.clear();

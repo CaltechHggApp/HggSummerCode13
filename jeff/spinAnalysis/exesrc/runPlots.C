@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 
 #include "MakePlots.h"
 #include "ReadConfig.hh"
