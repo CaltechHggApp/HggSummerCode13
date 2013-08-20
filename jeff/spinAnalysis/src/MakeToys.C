@@ -7,7 +7,7 @@ using namespace RooFit;
 
 MakeToys::MakeToys()
 {
-   ws = new RooWorkspace("ws");
+//   ws = new RooWorkspace("ws");
    mass = new RooRealVar("mass","diphoton mass",110,140);
    cosT = new RooRealVar("cosT","Collins - Soper angle",0,1);
    mass->setBins(30);
@@ -15,7 +15,7 @@ MakeToys::MakeToys()
 
 MakeToys::~MakeToys()
 {
-   delete ws;
+//   delete ws;
    delete mass;
    delete cosT;
 }
@@ -25,11 +25,11 @@ void MakeToys::makePdfs()
 {
    cosT->setBins(nBins);
    readMC();
-   double n_before = MC0->numEntries();
+   int n_before = MC0->numEntries();
    MC0=applyCuts(MC0);
    MC2=applyCuts(MC2);
-   double n_after = MC0->numEntries();
-   acceptance_x_efficiency = n_after / n_before;
+   int n_after = MC0->numEntries();
+   acceptance_x_efficiency = (float)n_after / (float)n_before;
 
    // these are just to define the pfd's and aren't used anywhere else
    RooRealVar mean_sig_mass("mean_sig_mass","",125,80,160);
@@ -54,6 +54,7 @@ void MakeToys::makePdfs()
    RooExponential model_bkg_mass("model_bkg_mass","",*mass,c_bkg_mass);
    RooPolynomial model_bkg_cosT("model_bkg_cosT","",*cosT,RooArgList(p1_bkg_cosT,p2_bkg_cosT));
 
+   ws = new RooWorkspace("ws");
    ws->import(model_sig_mass);
    ws->import(model_sig0_cosT);
    ws->import(model_sig2_cosT);
@@ -103,8 +104,8 @@ void MakeToys::readMC()
    RooRealVar pt2("pt2","",0,500);
    RooRealVar maxEta("maxEta","",0,50);
 
-   TFile file0(MC_filename);
-   TFile file2(MC_filename);
+   TFile file0(MC0_filename);
+   TFile file2(MC2_filename);
 
    MC0 = new RooDataSet("MC0","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file0.Get("tree"))));
    MC2 = new RooDataSet("MC2","",RooArgSet(*mass,*cosT,maxEta,pt1,pt2),Import(*((TTree*)file2.Get("tree"))));
@@ -124,22 +125,22 @@ void MakeToys::calculate()
       thing.setNSignal(lumi_to_nsignal(*lumiIt));
       double pvals[nToys];
       thing.prepare_gen();
-      gStyle->SetOptStat("orme");
+//      gStyle->SetOptStat("orme");
 //      TFile f("rawr.root","recreate");
-      TH1F hist("hist","",10,0,.01);
-      hist.StatOverflows();
+//      TH1F hist("hist","",10,0,.01);
+//      hist.StatOverflows();
       for(int i=0; i<nToys; i++)
       {
-	 cout<<"making toy "<<i<<" at "<<*lumiIt<<"fb"<<endl;
+	 if(i % 10 == 0) cout<<"making toy "<<i<<" at "<<*lumiIt<<"fb"<<endl;
 	 thing.generate_toy();
 	 thing.extract_signal();
 	 pvals[i] = thing.getPvalue();
-       hist.Fill(pvals[i]);
+//       hist.Fill(pvals[i]);
       }
-      hist.SetLineColor(kBlack);
-      hist.SetMarkerStyle(20);
-      hist.GetXaxis()->SetTitle("p-value");
-      hist.GetYaxis()->SetTitle("Events / ");
+//      hist.SetLineColor(kBlack);
+//     hist.SetMarkerStyle(20);
+//      hist.GetXaxis()->SetTitle("p-value");
+//      hist.GetYaxis()->SetTitle("Events / ");
 //      hist.Write();
       double quantiles[3];
       double prob[3]={.159,.5,.841};
@@ -174,7 +175,7 @@ void MakeToys::make_plot_of_toy()
 
 void MakeToys::make_plot_lumi(TString filename)
 {
-   cout<<"\nMAKING PVALUE VS LUMI PLOT"<<endl;
+//   cout<<"\nMAKING PVALUE VS LUMI PLOT"<<endl;
    int n = lumi.size();
    double x[n];
    double y[n];
@@ -196,15 +197,19 @@ void MakeToys::make_plot_lumi(TString filename)
    TFile f(filename,"recreate");
    TGraphAsymmErrors graph(n,x,y,dx_low,dx_hi, dy_low, dy_hi);
    graph.SetName("graph");
-   graph.SetTitle("pval vs. lumi");
-   graph.SetMarkerStyle(20);
-   graph.SetMarkerSize(1.0);
-   graph.GetXaxis()->SetTitle("lumi");
-   graph.GetYaxis()->SetTitle("expected pvalue");
-   graph.SetMaximum(1.0e-1);
-   graph.SetMinimum(1.0e-7);
+//   graph.SetTitle("pval vs. lumi");
+//   graph.SetMarkerStyle(20);
+//   graph.SetMarkerSize(1.0);
+//   graph.GetXaxis()->SetTitle("lumi");
+//   graph.GetYaxis()->SetTitle("expected pvalue");
+//   graph.SetMaximum(1.0e-1);
+//   graph.SetMinimum(1.0e-7);
    graph.Write();
    f.Close();
+   pvalueMedian.clear();
+   pvalue1stQuartile.clear();
+   pvalue3rdQuartile.clear();
+   delete ws;
 }
 
 

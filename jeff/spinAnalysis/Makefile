@@ -28,13 +28,13 @@ EXESRCDIR        = ./exesrc/
 CXX	         += -I$(INCLUDEDIR) -I$(INCLUDEDIRCOMMON) -I. -I$(INCLUDEDIRROOFIT)
 OUTLIB   	= ./lib/
 
-all: runMC runToys
+all: runMC runToys runPlots
 
 clean:
 	rm -f $(OUTLIB)*.o
 	rm -f runMC
 	rm -f runToys
-
+	rm -f runPlots
 
 
 runMC:          $(EXESRCDIR)runMC.C \
@@ -52,6 +52,15 @@ runToys:	$(EXESRCDIR)runToys.C \
 	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o runToys $(OUTLIB)/*.o $(GLIBS) $<
 
 
+runPlots:	$(EXESRCDIR)runPlots.C \
+		$(OUTLIB)MakePlots.o \
+		$(HGGAPPINC)ReadConfig.hh
+	$(CXX) $(CXXFLAGS) $(ROOFITLIBS) -I$(HGGAPPINC) -I$(INCLUDEDIR) -o runPlots $(OUTLIB)/*.o $(GLIBS) $<
+
+
+
+
+
 $(OUTLIB)AnalyzeMC.o:	$(SRCDIR)AnalyzeMC.C
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)AnalyzeMC.o $<
 
@@ -67,3 +76,5 @@ $(OUTLIB)MakeToys.o: $(SRCDIR)MakeToys.C
 $(OUTLIB)MakeSpinSPlot.o: $(SRCDIR)MakeSpinSPlot.C
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeSpinSPlot.o $<
 
+$(OUTLIB)MakePlots.o: $(SRCDIR)MakePlots.C
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakePlots.o $<

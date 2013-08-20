@@ -44,7 +44,8 @@ class MakeToys
 {
 public:
    double etaMax;
-   TString MC_filename;
+   TString MC0_filename;
+   TString MC2_filename;
    double plotLumi;
    int nBins;
    int nToys;
@@ -66,8 +67,9 @@ public:
 
    MakeToys();
    ~MakeToys();
-   void setMaxEta(float eta){etaMax=eta;}
-   void setMCFilename(TString filename) {MC_filename = filename;}
+   void setMaxEta(double eta){etaMax=eta;}
+   void setMC0Filename(TString filename) {MC0_filename = filename;}
+   void setMC2Filename(TString filename) {MC2_filename = filename;}
    void setNBins(int nbins){nBins = nbins;}
    void setLumi(double luminosity) {plotLumi = luminosity;}
    void setCheat(int TrueFalse) {cheat = TrueFalse;}

@@ -4,8 +4,8 @@
 
 void AnalyzeToy::setNSignal(double nsig)
 {
-   nSignal_gen = round(nsig);
-   nBackground_gen = round(20 * nSignal_gen);
+   nSignal_gen = floor(nsig);
+   nBackground_gen = floor(20 * nSignal_gen);
 }
 
 
@@ -47,8 +47,8 @@ void AnalyzeToy::calculate_yield()
       RooRealVar tempBkgYield("tempBkgYield","",0,5 * nBackground_gen);
       RooAddPdf model_mass("model_mass","",RooArgList( *(ws->pdf("model_sig_mass")), *(ws->pdf("model_bkg_mass")) ),RooArgList(tempSigYield,tempBkgYield));
       model_mass.fitTo(*toyData,PrintLevel(-1));
-      signalYield = round(tempSigYield.getVal());
-      backgroundYield = round(tempBkgYield.getVal());
+      signalYield = floor(tempSigYield.getVal());
+      backgroundYield = floor(tempBkgYield.getVal());
    }
 }
 

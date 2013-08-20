@@ -49,19 +49,22 @@ int main()
       cout<<"Running over spin0 MC"<<endl;
       analyzer.setData(makeTree("0",high_statistics));
       analyzer.setResolution(EB_res, EE_res);
-      analyzer.Loop("./tempData/0_" + label + ".root");
+      analyzer.Loop("./tempData/MC_0_" + label + ".root");
+      cout<<endl;
 
       // Run over spin 2gg data
       cout<<"Running over spin2gg MC"<<endl;
       analyzer.setData(makeTree("2gg",high_statistics));
       analyzer.setResolution(EB_res, EE_res);
-      analyzer.Loop("./tempData/2gg_" + label + ".root");
+      analyzer.Loop("./tempData/MC_2gg_" + label + ".root");
+      cout<<endl;
 
       // Run over spin 2qq data
       cout<<"Running over spin2qq MC"<<endl;
       analyzer.setData(makeTree("2qq",high_statistics));
       analyzer.setResolution(EB_res, EE_res);
-      analyzer.Loop("./tempData/2qq_" + label + ".root");
+      analyzer.Loop("./tempData/MC_2qq_" + label + ".root");
+      cout<<endl;
    }
 
    return 0;
