@@ -961,10 +961,12 @@ void MakeSpinFits::MakeBackgroundOnlyFit(TString catTag, float cosTlow, float co
       RooRealVar* alphapow1 = new RooRealVar(dataTag+Form("_BKGFIT_%s_alphapow1",outputTag.Data()),"alphapow1",-10.0,0.0);
       RooRealVar* alphapow2 = new RooRealVar(dataTag+Form("_BKGFIT_%s_alphapow2",outputTag.Data()),"alphapow2",-10.0,0.0);
       RooRealVar* f_bkg  = new RooRealVar(dataTag+Form("_BKGFIT_%s_f",outputTag.Data()),"f_bkg",0.1,0,1);
-
-      BkgShape = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"","@3*(@0^@1)+(1-@3)*@0^@2)", RooArgList(mass,*alphapow1,*alphapow2),*f_bkg);
+      RooGenericPdf* pow1 = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_pow1",outputTag.Data()),"","@0^@1",RooArgList(mass,*alphapow1));
+      RooGenericPdf* pow2 = new RooGenericPdf(dataTag+Form("_BKGFIT_%s_pow2",outputTag.Data()),"","@0^@1",RooArgList(mass,*alphapow2));
+      
+      BkgShape = new RooAddPdf(dataTag+Form("_BKGFIT_%s_bkgShape",outputTag.Data()),"",RooArgList(*pow1,*pow2),*f_bkg);
       break;
-    }
+   }
 
   default:
     std::cout << "INVALID BACKGROUND MODEL" << std::endl;
