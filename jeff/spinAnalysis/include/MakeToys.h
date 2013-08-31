@@ -36,6 +36,7 @@
 #include <numeric>
 #include <vector>
 #include "TGraphErrors.h"
+#include <string>
 
 using namespace std;
 using namespace RooFit;
@@ -43,13 +44,14 @@ using namespace RooFit;
 class MakeToys
 {
 public:
-   double etaMax;
-   TString MC0_filename;
-   TString MC2_filename;
-   double plotLumi;
    int nBins;
    int nToys;
    int cheat;
+   int qqbar_percent;
+   double lumi;
+   string etaMax;
+   string EB_res;
+   string EE_res;
 
    RooWorkspace *ws;
    double acceptance_x_efficiency;
@@ -58,29 +60,23 @@ public:
    RooRealVar *cosT;
 
    RooDataSet *MC0;
-   RooDataSet *MC2;
-   vector<double> lumi;
-   vector<double> pvalueMedian;
-   vector<double> pvalue1stQuartile;
-   vector<double> pvalue3rdQuartile;
+   RooDataSet *MC2gg;
+   RooDataSet *MC2qq;
 
 
    MakeToys();
    ~MakeToys();
-   void setMaxEta(double eta){etaMax=eta;}
-   void setMC0Filename(TString filename) {MC0_filename = filename;}
-   void setMC2Filename(TString filename) {MC2_filename = filename;}
-   void setNBins(int nbins){nBins = nbins;}
-   void setLumi(double luminosity) {plotLumi = luminosity;}
-   void setCheat(int TrueFalse) {cheat = TrueFalse;}
+   void setNBins(int nbins);
    void setNToys(int n) {nToys = n;}
-   void setLumis(vector<double> numbers) {lumi = numbers;}
+   void setCheat(int TrueFalse) {cheat = TrueFalse;}
+   void set_qqbar_percent(double percent) {qqbar_percent = percent; }
+   void setLumi(double luminosity) {lumi = luminosity;}
+   void setMaxEta(string eta){etaMax=eta;}
+   void setResolution(string EB, string EE) {EB_res=EB; EE_res=EE; }
    void makePdfs();
-   void make_plot_of_toy();
-   void calculate();
-   void make_plot_lumi(TString filename);
-   void make_plot_sigma();
-   void readMC();
+   void createPoint();
+   void savePoint(double*);
+   void importMC();
    RooDataSet* applyCuts(RooDataSet *originalData);
    double lumi_to_nsignal(double lumi);
 };

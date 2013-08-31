@@ -55,24 +55,24 @@ public:
    RooAbsPdf::GenSpec *genSpec_bkg_mass;
    RooAbsPdf::GenSpec *genSpec_bkg_cosT;
 
-
-
    RooDataSet *toyData;
    RooDataSet *extractedData;
+   double pvalue;
 
    AnalyzeToy();
    ~AnalyzeToy();
    void setNBins(int nbins) { cosT->setBins(nbins);}
-   void setNSignal(double);
    void setCheat(int TrueFalse) {cheat = TrueFalse;}
    void setPdfs(RooWorkspace *workspace) {ws = workspace;}
+   void setNSignal(double);
    void prepare_gen();
+   void run();
    void generate_toy();
    void calculate_yield();
    void extract_signal();
    void plot();
-   double getPvalue();
-
+   void calculate_pval();
+   double getPvalue() { return pvalue;}
 };
 
 #endif

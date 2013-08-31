@@ -21,13 +21,22 @@
 
 using namespace std;
 
-const Int_t kMaxGenParticle = 500;
+
+/*           ===NOTE===
+ * The 8TeV MC is vecbos format, but the 14TeV MC isn't. I don't know what it's actually
+ * called but I'm calling it BACON below. It passes different variables so some functions
+ * below are to "import" it into vecbos format.
+ */
+
+const Int_t kMaxGenParticle = 500;  // BACON needs it this big
+
 
 class AnalyzeMC {
 public :
-   TTree   *chain;
+   TTree   *chain; // main tree
 
-   Int_t   nMc;
+   // vecbos variables
+   Int_t   nMc;   
    Float_t pMc[kMaxGenParticle];
    Float_t thetaMc[kMaxGenParticle];
    Float_t etaMc[kMaxGenParticle];
@@ -36,8 +45,9 @@ public :
    Int_t mothMc[kMaxGenParticle];
    Int_t statusMc[kMaxGenParticle];
 
-   Int_t motherID[kMaxGenParticle];
+   Int_t motherID[kMaxGenParticle]; // not Vecbos. I invented this so BACON would play nice.
 
+   // These just make BACON work. Never use them.
    Float_t         genVertexX;
    Float_t         genVertexY;
    Float_t         genVertexZ;
@@ -51,7 +61,7 @@ public :
    Int_t   PFCandidate_;
    Int_t   Vertex_;
 
-
+   // Declaring branches.
    TBranch        *b_GenParticle_;
    TBranch        *b_GenParticle_pt;
    TBranch        *b_GenParticle_eta;
@@ -68,17 +78,17 @@ public :
    TBranch        *b_PFCandidate_;
    TBranch        *b_Vertex_;
 
-   float EB_res;
-   float EE_res;
+   float EB_res; // ECAL barrel resolution
+   float EE_res; // ECAL endcap resolution
 
-   AnalyzeMC();
+   AnalyzeMC(); 
    ~AnalyzeMC();
    void setData(TTree *tree);
-   void Init_vecbos(TTree *tree);
-   void Init_bacon(TTree *tree);
+   void Init_vecbos(TTree *tree); // associate branches with variables
+   void Init_bacon(TTree *tree); // associate branches with variables BACON is a little different
    void setResolution(float EB_res, float EE_res);
-   void Loop(TString);
-   void GetEntry(Long64_t);
+   void Loop(TString); // run over the MC
+   void GetEntry(Long64_t); // "imports" the entry from vecobs/BACON into common format
 
 };
 

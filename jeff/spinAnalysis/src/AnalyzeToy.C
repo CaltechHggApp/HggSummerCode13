@@ -2,6 +2,20 @@
 #include "MakeSpinSPlot.h"
 
 
+AnalyzeToy::AnalyzeToy()
+{
+   mass = new RooRealVar("mass","",110,140);
+   cosT = new RooRealVar("cosT","",0.,1.);
+   mass->setBins(30);
+}
+
+
+AnalyzeToy::~AnalyzeToy()
+{
+   delete mass;
+   delete cosT;
+}
+
 void AnalyzeToy::setNSignal(double nsig)
 {
    nSignal_gen = floor(nsig);
@@ -11,16 +25,24 @@ void AnalyzeToy::setNSignal(double nsig)
 
 void AnalyzeToy::prepare_gen()
 {
-   genSpec_sig_mass = ws->pdf("model_sig_mass")->prepareMultiGen(*mass, NumEvents(nSignal_gen));
+   genSpec_sig_mass = ws->pdf("model_signal_mass")->prepareMultiGen(*mass, NumEvents(nSignal_gen));
    genSpec_bkg_mass = ws->pdf("model_bkg_mass")->prepareMultiGen(*mass, NumEvents(nBackground_gen));
    genSpec_bkg_cosT = ws->pdf("model_bkg_cosT")->prepareMultiGen(*cosT, NumEvents(nBackground_gen));
+}
+
+void AnalyzeToy::run()
+{
+   generate_toy();
+   extract_signal();
+   calculate_pval();
+   delete extractedData;
 }
 
 void AnalyzeToy::generate_toy()
 {
    RooDataSet *toySignal;
-   toySignal = ws->pdf("model_sig_mass")->generate(*genSpec_sig_mass);
-   toySignal->merge(ws->pdf("model_sig0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false))); 
+   toySignal = ws->pdf("model_signal_mass")->generate(*genSpec_sig_mass);
+   toySignal->merge(ws->pdf("model_signal0_cosT")->generate(*cosT,nSignal_gen,AutoBinned(false))); 
 
    RooDataSet *toyBkg;
    toyBkg= ws->pdf("model_bkg_mass")->generate(*genSpec_bkg_mass);
@@ -34,29 +56,11 @@ void AnalyzeToy::generate_toy()
    delete toyBkg;
 }
 
-void AnalyzeToy::calculate_yield()
-{
-   if(cheat)
-   {
-      signalYield = nSignal_gen;
-      backgroundYield = nBackground_gen;
-   }
-   else
-   {
-      RooRealVar tempSigYield("tempSigYield","",0,5 * nSignal_gen);
-      RooRealVar tempBkgYield("tempBkgYield","",0,5 * nBackground_gen);
-      RooAddPdf model_mass("model_mass","",RooArgList( *(ws->pdf("model_sig_mass")), *(ws->pdf("model_bkg_mass")) ),RooArgList(tempSigYield,tempBkgYield));
-      model_mass.fitTo(*toyData,PrintLevel(-1));
-      signalYield = floor(tempSigYield.getVal());
-      backgroundYield = floor(tempBkgYield.getVal());
-   }
-}
-
 void AnalyzeToy::extract_signal()
 {
    calculate_yield();
    MakeSpinSPlot splotter(toyData);
-   splotter.addSpecies("signal",ws->pdf("model_sig_mass"),signalYield);
+   splotter.addSpecies("signal",ws->pdf("model_signal_mass"),signalYield);
    splotter.addSpecies("background",ws->pdf("model_bkg_mass"),backgroundYield);
    splotter.addVariable(ws->var("mass"));
    splotter.calculate();
@@ -82,7 +86,26 @@ void AnalyzeToy::extract_signal()
       cosT->setVal(toyData->get(i)->getRealValue("cosT"));
       extractedData->add(event,weight_double);
    }
+   delete toyData;
 }
+void AnalyzeToy::calculate_yield()
+{
+   if(cheat)
+   {
+      signalYield = nSignal_gen;
+      backgroundYield = nBackground_gen;
+   }
+   else
+   {
+      RooRealVar tempSigYield("tempSigYield","",0,5 * nSignal_gen);
+      RooRealVar tempBkgYield("tempBkgYield","",0,5 * nBackground_gen);
+      RooAddPdf model_mass("model_mass","",RooArgList( *(ws->pdf("model_signal_mass")), *(ws->pdf("model_bkg_mass")) ),RooArgList(tempSigYield,tempBkgYield));
+      model_mass.fitTo(*toyData,PrintLevel(-1));
+      signalYield = tempSigYield.getVal();
+      backgroundYield = tempBkgYield.getVal();
+   }
+}
+
 
 
 void AnalyzeToy::plot()
@@ -121,37 +144,19 @@ void AnalyzeToy::plot()
 }
 
 
-double AnalyzeToy::getPvalue()
+void AnalyzeToy::calculate_pval()
 {
-   RooPlot* frame1 = cosT->frame();
+   RooPlot* frame = cosT->frame();
    RooAbsData *data = extractedData->reduce("cosT");
-   RooDataHist hist3("hist3","",*cosT,*data);
-   RooAbsPdf *model_sig2_cosT = ws->pdf("model_sig2_cosT");
-   hist3.plotOn(frame1);
-   model_sig2_cosT->plotOn(frame1);
+   RooDataHist hist("hist","",*cosT,*data);
+   hist.plotOn(frame);
+
+   RooAbsPdf *model_signal2gg_cosT = ws->pdf("model_signal2gg_cosT");
+   model_signal2gg_cosT->plotOn(frame);
 
    int dof = cosT->getBins() - 1;
-   double chi2 = frame1->chiSquare() * dof;
-//   cout<<"-chi squared is "<<chi2<<endl;
-   double pvalue = TMath::Prob(chi2,dof);
-//   cout<<"-dof is"<<dof<<endl;
-//   cout<<"-pvalue is "<< pvalue<<endl;
-   return pvalue;
+   double chi2 = frame->chiSquare() * dof;
+   pvalue = TMath::Prob(chi2,dof);
 }
 
 
-AnalyzeToy::AnalyzeToy()
-{
-   mass = new RooRealVar("mass","",110,140);
-   cosT = new RooRealVar("cosT","",0.,1.);
-   mass->setBins(30);
-}
-
-
-AnalyzeToy::~AnalyzeToy()
-{
-   delete mass;
-   delete cosT;
-   delete toyData;
-   delete extractedData;
-}
